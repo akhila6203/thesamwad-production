@@ -1,0 +1,35 @@
+
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Environment files and secrets
+.env
+.env.*
+!.env.example
+**/.env
+**/.env.*
+
+# Build output
+dist/
+**/dist/
+build/
+**/build/
+
+# ZIP and archive files
+*.zip
+*.ZIP
+*.rar
+*.7z
+*.tar
+*.gz
+
+# Editor settings
+.vscode/
+
+# Logs
+*.log
+
+# Backend uploads
+backend/uploads/*
+!backend/uploads/.gitkeep
