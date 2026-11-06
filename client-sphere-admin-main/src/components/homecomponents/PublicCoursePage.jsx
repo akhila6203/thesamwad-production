@@ -76,16 +76,19 @@ export default function PublicCoursePage() {
 
   if (error || !course) {
     return (
-      <div className="p-6 min-h-screen bg-gray-100">
+      // <div className="p-6 min-h-screen bg-gray-100">
+      <div className="p-6 min-h-screen bg-background text-foreground">
         <button
           type="button"
           onClick={() => navigate("/")}
-          className="flex items-center gap-2 mb-4 text-sm text-gray-600"
+          // className="flex items-center gap-2 mb-4 text-sm text-gray-600"
+          className="flex items-center gap-2 mb-4 text-sm text-foreground hover:text-primary"
         >
           <ArrowLeft className="h-4 w-4" /> Back to home
         </button>
         <h2 className="text-lg font-semibold">Course not found</h2>
-        <p className="text-sm text-gray-500 mt-2">
+        {/* <p className="text-sm text-gray-500 mt-2"> */}
+        <p className="text-sm text-muted-foreground mt-2">
           This course may be unpublished or does not exist.
         </p>
       </div>
@@ -115,7 +118,8 @@ export default function PublicCoursePage() {
 
       <div className="grid grid-cols-1 gap-4 sm:gap-5 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)] lg:gap-5 xl:gap-6">
         <div className="w-full min-w-0 space-y-6">
-          <div className="w-full overflow-hidden rounded-xl bg-white shadow ring-1 ring-border/40">
+          <div className="w-full overflow-hidden rounded-xl bg-card text-card-foreground shadow ring-1 ring-border/40">
+          {/* <div className="w-full overflow-hidden rounded-xl bg-white shadow ring-1 ring-border/40"> */}
             <VideoPlayer
               src={previewSrc}
               title={previewTitle}
@@ -125,14 +129,16 @@ export default function PublicCoursePage() {
             />
           </div>
 
-          <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3 bg-purple-50 border border-purple-200 p-4 rounded-xl">
+<div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3 bg-muted text-foreground border border-border p-4 rounded-xl">
+          {/* <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3 bg-[#c1c5c8] border border-[#dde7ee] p-4 rounded-xl"> */}
   <div className="flex gap-3">
-    <Lock className="text-purple-600 shrink-0" />
+    <Lock className="text-[#2879B5]  shrink-0" />
     <div>
       <p className="font-semibold text-sm">
         Preview: first lesson free
       </p>
-      <p className="text-xs text-gray-500">
+      {/* <p className="text-xs text-black"> */}
+      <p className="text-xs text-muted-foreground">
         Sign in to watch all lessons for your class.
       </p>
     </div>
@@ -141,7 +147,7 @@ export default function PublicCoursePage() {
   <button
     type="button"
     onClick={handleProtected}
-    className="bg-gradient-to-r from-purple-600 to-indigo-500 text-white px-5 py-2 rounded-lg text-sm"
+    className="bg-gradient-to-r from-[#2879B5] to-[#507b9b] text-white px-5 py-2 rounded-lg text-sm"
   >
     Continue
   </button>
@@ -187,23 +193,28 @@ export default function PublicCoursePage() {
 
           <div>
             <div className="flex gap-2 mb-2 flex-wrap">
-              <span className="bg-gray-200 text-xs px-2 py-1 rounded">
+              {/* <span className="bg-gray-200 text-xs px-2 py-1 rounded"> */}
+              <span className="bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-100 text-xs px-2 py-1 rounded">
                 {course.category || course.classLevel}
               </span>
               {(course.subCategory || course.subject) && (
-                <span className="bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded">
+                <span className="bg-blue-100 text-[#2879B5] text-xs px-2 py-1 rounded">
                   {course.subCategory || course.subject}
                 </span>
               )}
             </div>
 
-            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold">
+            {/* <h1 className="text-xl sm:text-2xl md:text-3xl font-bold"> */}
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground">
               {course.title}
             </h1>
 
-            <p className="text-gray-500 mt-2 text-sm">{course.description}</p>
+            {/* <p className="text-gray-500 mt-2 text-sm"> */}
+            <p className="text-muted-foreground mt-2 text-sm leading-relaxed">
+              {course.description}</p>
 
-            <div className="flex flex-wrap gap-3 mt-3 text-xs sm:text-sm text-gray-600">
+<div className="flex flex-wrap gap-3 mt-3 text-xs sm:text-sm text-muted-foreground">
+            {/* <div className="flex flex-wrap gap-3 mt-3 text-xs sm:text-sm text-gray-600"> */}
               {/* <span className="flex items-center gap-1">
                 <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
                 {course.rating} ({course.reviews})
@@ -216,21 +227,26 @@ export default function PublicCoursePage() {
                 <BookOpen className="h-4 w-4" />
                 {course.lessons} lessons
               </span>
-              <span className="text-gray-500">
+              {/* <span className="text-gray-500"> */}
+              <span className="text-muted-foreground">
                 By <span className="font-medium">{course.instructor}</span>
               </span>
             </div>
           </div>
 
           {/* TABS */}
-          <div className="flex w-full justify-start gap-2 overflow-x-auto rounded-xl bg-gray-200 p-1">
+          <div className="flex w-full justify-start gap-2 overflow-x-auto rounded-xl bg-muted p-1">
+          {/* <div className="flex w-full justify-start gap-2 overflow-x-auto rounded-xl bg-gray-200 p-1"> */}
             <button
               type="button"
               onClick={() => setTab("overview")}
               className={`px-4 py-1.5 rounded-lg text-sm flex items-center gap-1 transition whitespace-nowrap ${
+                // tab === "overview"
+                //   ? "bg-white shadow text-black font-medium"
+                //   : "text-gray-600"
                 tab === "overview"
-                  ? "bg-white shadow text-black font-medium"
-                  : "text-gray-600"
+  ? "bg-card shadow text-foreground font-medium"
+  : "text-muted-foreground hover:text-foreground"
               }`}
             >
               Overview
@@ -239,9 +255,12 @@ export default function PublicCoursePage() {
               type="button"
               onClick={() => setTab("materials")}
               className={`px-4 py-1.5 rounded-lg text-sm flex items-center gap-1 transition whitespace-nowrap ${
+                // tab === "materials"
+                //   ? "bg-white shadow text-black font-medium"
+                //   : "text-gray-600"
                 tab === "materials"
-                  ? "bg-white shadow text-black font-medium"
-                  : "text-gray-600"
+  ? "bg-card shadow text-foreground font-medium"
+  : "text-muted-foreground hover:text-foreground"
               }`}
             >
               <FileText className="h-4 w-4" /> Materials
@@ -250,9 +269,12 @@ export default function PublicCoursePage() {
               type="button"
               onClick={() => setTab("quiz")}
               className={`px-4 py-1.5 rounded-lg text-sm flex items-center gap-1 transition whitespace-nowrap ${
+                // tab === "quiz"
+                //   ? "bg-white shadow text-black font-medium"
+                //   : "text-gray-600"
                 tab === "quiz"
-                  ? "bg-white shadow text-black font-medium"
-                  : "text-gray-600"
+  ? "bg-card shadow text-foreground font-medium"
+  : "text-muted-foreground hover:text-foreground"
               }`}
             >
               <ListChecks className="h-4 w-4" /> Quizzes
@@ -260,9 +282,13 @@ export default function PublicCoursePage() {
           </div>
 
           {tab === "overview" && (
-            <div className="mt-4 bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-              <h3 className="font-semibold mb-4">What you'll learn</h3>
-              <ul className="space-y-2 text-sm">
+            <div className="mt-4 bg-card text-card-foreground p-6 rounded-xl shadow-sm border border-border">
+             {/* <div className="mt-4 bg-white p-6 rounded-xl shadow-sm border border-gray-200"> */}
+              {/* <h3 className="font-semibold mb-4"> */}
+              <h3 className="font-semibold mb-4 text-foreground">
+                What you'll learn</h3>
+              {/* <ul className="space-y-2 text-sm"> */}
+              <ul className="space-y-2 text-sm text-muted-foreground">
                   {(course.overview?.length ? course.overview : ["No overview added"]).map((b) => (
                     <li key={b} className="flex gap-2">
                       <Check className="h-4 w-4 text-green-500" />
@@ -274,18 +300,22 @@ export default function PublicCoursePage() {
           )}
 
           {tab === "materials" && (
-            <div className="mt-4 border border-dashed border-gray-300 rounded-xl p-10 text-center bg-gray-50">
-              <div className="mx-auto w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center mb-4">
-                <FileText className="text-gray-500" />
+            <div className="mt-4 border border-dashed border-border rounded-xl p-10 text-center bg-card text-card-foreground">
+             {/* <div className="mt-4 border border-dashed border-gray-300 rounded-xl p-10 text-center bg-gray-50"> */}
+              {/* <div className="mx-auto w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center mb-4"> */}
+              <div className="mx-auto w-12 h-12 rounded-full bg-muted flex items-center justify-center mb-4">
+                {/* <FileText className="text-gray-500" /> */}
+                <FileText className="text-muted-foreground" />
               </div>
               <h3 className="font-medium text-sm">Course materials are locked</h3>
-              <p className="text-xs text-gray-500 mt-1">
+              {/* <p className="text-xs text-gray-500 mt-1"> */}
+              <p className="text-xs text-muted-foreground mt-1">
                 Sign in to download module PDFs, code samples and reference sheets.
               </p>
               <button
                 type="button"
                 onClick={handleProtected}
-                className="mt-4 bg-gradient-to-r from-purple-600 to-indigo-500 text-white px-5 py-2 rounded-lg text-sm"
+                className="mt-4 bg-gradient-to-r from-[#2879B5] to-orange-500 text-white px-5 py-2 rounded-lg text-sm"
               >
                 Continue
               </button>
@@ -293,18 +323,22 @@ export default function PublicCoursePage() {
           )}
 
           {tab === "quiz" && (
-            <div className="mt-4 border border-dashed border-gray-300 rounded-xl p-10 text-center bg-gray-50">
-              <div className="mx-auto w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center mb-4">
-                <ListChecks className="text-gray-500" />
+            <div className="mt-4 border border-dashed border-border rounded-xl p-10 text-center bg-card text-card-foreground">
+             {/* <div className="mt-4 border border-dashed border-gray-300 rounded-xl p-10 text-center bg-gray-50"> */}
+              {/* <div className="mx-auto w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center mb-4"> */}
+              <div className="mx-auto w-12 h-12 rounded-full bg-muted flex items-center justify-center mb-4">
+                {/* <ListChecks className="text-gray-500" /> */}
+                <ListChecks className="text-muted-foreground" />
               </div>
               <h3 className="font-medium text-sm">Quizzes are locked</h3>
-              <p className="text-xs text-gray-500 mt-1">
+              {/* <p className="text-xs text-gray-500 mt-1"> */}
+              <p className="text-xs text-muted-foreground mt-1">
                 Sign in to take module knowledge checks and the final quiz.
               </p>
               <button
                 type="button"
                 onClick={handleProtected}
-                className="mt-4 bg-gradient-to-r from-purple-600 to-indigo-500 text-white px-5 py-2 rounded-lg text-sm"
+                className="mt-4 bg-gradient-to-r from-[#2879B5] to-orange-500 text-white px-5 py-2 rounded-lg text-sm"
               >
                 Continue
               </button>
@@ -313,9 +347,12 @@ export default function PublicCoursePage() {
         </div>
 
         <div className="space-y-4 mt-4 lg:mt-0">
-          <div className="bg-white p-5 rounded-xl shadow space-y-3">
-            <h3 className="text-sm font-semibold">Get full access</h3>
-            <p className="text-xs text-gray-500">
+          {/* <div className="bg-white p-5 rounded-xl shadow space-y-3"> */}
+          <div className="bg-card text-card-foreground border border-border p-5 rounded-xl shadow space-y-3">
+            {/* <h3 className="text-sm font-semibold">Get full access</h3> */}
+            <h3 className="text-sm font-semibold text-foreground">Get full access</h3>
+            {/* <p className="text-xs text-gray-500"> */}
+            <p className="text-xs text-muted-foreground">
               {isLoggedIn
                 ? "Open this class to access all lessons, materials, and quizzes."
                 : "Sign in with your admin-registered Gmail to unlock all content."}
@@ -323,22 +360,27 @@ export default function PublicCoursePage() {
             <button
               type="button"
               onClick={handleProtected}
-              className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-indigo-500 text-white py-2 rounded-lg text-sm"
+              className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-[#2879B5] to-[#5c809b] text-white py-2 rounded-lg text-sm"
             >
               {isLoggedIn ? "Open class" : "Sign in with Gmail"}
             </button>
           </div>
 
-          <div className="bg-white rounded-xl shadow overflow-hidden">
-            <div className="p-4 border-b text-sm font-semibold">
+          {/* <div className="bg-white rounded-xl shadow overflow-hidden"> */}
+          <div className="bg-card text-card-foreground border border-border rounded-xl shadow overflow-hidden">
+            {/* <div className="p-4 border-b text-sm font-semibold"> */}
+            <div className="p-4 border-b border-border text-sm font-semibold text-foreground">
               Curriculum
-              <p className="text-xs text-gray-400 font-normal">
+              {/* <p className="text-xs text-gray-400 font-normal"> */}
+              <p className="text-xs text-muted-foreground font-normal">
                 {curriculum.length} lessons · {course.hours}h total
               </p>
             </div>
 
             {curriculum.length === 0 ? (
-              <p className="p-4 text-sm text-gray-500">No lessons added yet.</p>
+              // <p className="p-4 text-sm text-gray-500">
+              <p className="p-4 text-sm text-muted-foreground">
+                No lessons added yet.</p>
             ) : (
               curriculum.map((l, i) => (
                 <button
@@ -349,31 +391,44 @@ export default function PublicCoursePage() {
                     if (l.free) setActiveLessonIndex(i);
                     else handleProtected();
                   }}
-                  className={`w-full flex justify-between items-start sm:items-center gap-2 p-4 border-b text-xs sm:text-sm text-left transition ${
-                    !l.free ? "opacity-90 cursor-pointer" : "hover:bg-purple-50"
-                  } ${activeLessonIndex === i && l.free ? "bg-purple-50" : ""}`}
+                  className={`w-full flex justify-between items-start sm:items-center gap-2 p-4 border-b border-border text-xs sm:text-sm text-left text-foreground transition ${
+  !l.free
+    ? "opacity-90 cursor-pointer"
+    : "hover:bg-muted"
+} ${
+  activeLessonIndex === i && l.free
+    ? "bg-muted"
+    : ""
+}`}
+                  // className={`w-full flex justify-between items-start sm:items-center gap-2 p-4 border-b text-xs sm:text-sm text-left transition ${
+                  //   !l.free ? "opacity-90 cursor-pointer" : "hover:bg-purple-50"
+                  // } ${activeLessonIndex === i && l.free ? "bg-purple-50" : ""}`}
                 >
                   <div className="flex gap-2 items-center">
                     {l.free ? (
-                      <Play className="text-purple-600 h-4 w-4 shrink-0" />
+                      <Play className="text-[#2879B5]  h-4 w-4 shrink-0" />
                     ) : (
                       <Lock className="text-gray-400 h-4 w-4 shrink-0" />
                     )}
                     <span>{l.title}</span>
                   </div>
-                  <span className="text-gray-400 shrink-0">{l.duration}</span>
+                  <span className="text-muted-foreground shrink-0">{l.duration}</span>
+                  {/* <span className="text-gray-400 shrink-0">{l.duration}</span> */}
                 </button>
               ))
             )}
           </div>
 
-          <div className="bg-white p-4 rounded-xl shadow flex items-start gap-3">
-            <div className="p-2 rounded-lg bg-purple-100 text-purple-600">
+<div className="bg-card text-card-foreground border border-border p-4 rounded-xl shadow flex items-start gap-3">
+          {/* <div className="bg-white p-4 rounded-xl shadow flex items-start gap-3"> */}
+            <div className="p-2 rounded-lg bg-purple-100 text-[#2879B5] ">
               <Award className="h-5 w-5" />
             </div>
             <div>
-              <h3 className="text-sm font-semibold">Earn a certificate</h3>
-              <p className="text-xs text-gray-500 mt-1">
+              <h3 className="text-sm font-semibold text-foreground">Earn a certificate</h3>
+              {/* <h3 className="text-sm font-semibold">Earn a certificate</h3> */}
+              {/* <p className="text-xs text-gray-500 mt-1"> */}
+              <p className="text-xs text-muted-foreground mt-1">
                 Complete all lessons and the final quiz to receive your verified certificate.
               </p>
             </div>

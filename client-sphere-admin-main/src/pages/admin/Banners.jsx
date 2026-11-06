@@ -94,8 +94,10 @@ export default function AdminBanners() {
   };
 
   return (
-    <div className="space-y-6 px-3 py-3 sm:px-4 sm:py-4">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+    // <div className="space-y-6 px-3 py-3 sm:px-4 sm:py-4">
+    <div className="w-full min-w-0 space-y-5 px-3 py-3 sm:px-4 sm:py-4 lg:px-6">
+      {/* <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between"> */}
+      <div className="flex w-full min-w-0 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm text-muted-foreground">
           Upload and manage homepage banner images shown to learners.
         </p>
@@ -119,7 +121,8 @@ export default function AdminBanners() {
           No banners yet. Click Add Banner to upload one.
         </p>
       ) : (
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        // <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+         <div className="grid w-full min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3"> 
           {banners.map((b) => (
             <div
               key={b.id}
@@ -127,7 +130,8 @@ export default function AdminBanners() {
             >
               <img
                 src={b.image_url}
-                className="h-48 w-full object-cover"
+                // className="h-48 w-full object-cover"
+                className="aspect-video h-auto w-full object-cover"
                 alt=""
               />
               <div className="flex justify-end gap-1 p-3">
@@ -157,7 +161,8 @@ export default function AdminBanners() {
       )}
 
       <Dialog open={open} onOpenChange={handleOpenChange}>
-        <DialogContent className="max-w-lg rounded-2xl">
+        {/* <DialogContent className="max-w-lg rounded-2xl"> */}
+        <DialogContent className="w-[calc(100vw-24px)] max-w-lg max-h-[90dvh] overflow-y-auto rounded-2xl">
           <DialogHeader>
             <DialogTitle>{editing ? "Edit banner" : "Add banner"}</DialogTitle>
             <DialogDescription>

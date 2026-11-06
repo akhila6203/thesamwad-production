@@ -1,125 +1,211 @@
 const db = require("../config/db");
 const bcrypt = require("bcryptjs");
+
 const { setAuthCookie } = require("../utils/authCookie");
 const { toPublicAdmin } = require("../utils/authUsers");
-const jwt = require("jsonwebtoken");
 
-const emailExists = (normalizedEmail, callback) => {
-  db.query(
-    "SELECT id FROM admins WHERE email = ? LIMIT 1",
-    [normalizedEmail],
-    (err, adminRows) => {
-      if (err) return callback(err);
-      if (adminRows.length > 0) return callback(null, true);
-      
-      db.query(
-        "SELECT id FROM users WHERE email = ? LIMIT 1",
-        [normalizedEmail],
-        (err2, userRows) => {
-          if (err2) return callback(err2);
-          callback(null, userRows.length > 0);
-        }
-      );
-    }
-  );
-};
-
-exports.registerAdmin = async (req, res) => {
-  const { name, email, password } = req.body;
-
-  if (!name?.trim() || !email || !password) {
-    return res.status(400).json({ message: "All fields are required" });
-  }
-
-  const normalizedEmail = email.trim().toLowerCase();
-
-  emailExists(normalizedEmail, async (err, exists) => {
-    if (err) {
-      return res.status(500).json({ message: "Database error" });
-    }
-
-    if (exists) {
-      return res.status(409).json({ message: "Email already registered" });
-    }
-
-    try {
-      const hashedPassword = await bcrypt.hash(password, 10);
-
-      const insertSql = `
-        INSERT INTO admins (name, email, password, status)
-        VALUES (?, ?, ?, 'active')
-      `;
-
-      db.query(
-        insertSql,
-        [name.trim(), normalizedEmail, hashedPassword],
-        (insertErr, result) => {
-          if (insertErr) {
-            console.error(insertErr);
-            return res.status(500).json({ message: "Could not create admin" });
-          }
-
-          return res.status(201).json({
-            message: "Admin registered successfully",
-            adminId: result.insertId,
-          });
-        }
-      );
-    } catch {
-      return res.status(500).json({ message: "Password encryption failed" });
-    }
-  });
-};
+const ADMIN_EMAIL = "admin@thesamwad.com";
 
 exports.loginAdmin = (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
-    return res.status(400).json({ message: "Email and password required" });
+    return res.status(400).json({
+      message: "Email and password are required",
+    });
   }
 
   const normalizedEmail = email.trim().toLowerCase();
 
-  const sql = `SELECT * FROM admins WHERE email = ? LIMIT 1`;
+  // Only the configured admin email can log in here.
+  if (normalizedEmail !== ADMIN_EMAIL) {
+    return res.status(401).json({
+      message: "Invalid email or password",
+    });
+  }
 
-  db.query(sql, [normalizedEmail], async (err, result) => {
-    if (err) {
-      return res.status(500).json({ message: "Database error" });
+  db.query(
+    "SELECT * FROM admins WHERE email = ? LIMIT 1",
+    [ADMIN_EMAIL],
+    async (err, rows) => {
+      if (err) {
+        console.error("Admin login database error:", err);
+
+        return res.status(500).json({
+          message: "Database error",
+        });
+      }
+
+      if (!rows || rows.length === 0) {
+        return res.status(401).json({
+          message: "Admin account is not configured",
+        });
+      }
+
+      const admin = rows[0];
+
+      if (admin.status !== "active") {
+        return res.status(403).json({
+          message: "Admin account is inactive",
+        });
+      }
+
+      try {
+        // The database must contain a bcrypt password hash.
+        const isPasswordValid = await bcrypt.compare(
+          password,
+          admin.password || ""
+        );
+
+        if (!isPasswordValid) {
+          return res.status(401).json({
+            message: "Invalid email or password",
+          });
+        }
+
+        const token = setAuthCookie(res, {
+          id: admin.id,
+          role: "admin",
+        });
+
+        return res.json({
+          token,
+          user: toPublicAdmin(admin),
+        });
+      } catch (error) {
+        console.error("Admin password verification error:", error);
+
+        return res.status(500).json({
+          message: "Unable to log in",
+        });
+      }
     }
-
-    if (result.length === 0) {
-      return res.status(401).json({ message: "Invalid email or password" });
-    }
-
-    const admin = result[0];
-
-    if (admin.status !== "active") {
-      return res.status(403).json({ message: "Admin account is not active" });
-    }
-
-    const storedPassword = admin.password || "";
-    let passwordMatch = false;
-
-    if (storedPassword.startsWith("$2")) {
-      passwordMatch = await bcrypt.compare(password, storedPassword);
-    } else {
-      passwordMatch = storedPassword === password;
-    }
-
-    if (!passwordMatch) {
-      return res.status(401).json({ message: "Invalid email or password" });
-    }
-
-    const token = setAuthCookie(res, { id: admin.id, role: "admin" });
-
-res.json({
-  token,
-  user: toPublicAdmin(admin),
-});
-    // setAuthCookie(res, { id: admin.id, role: "admin" });
-
-    // res.json({
-    //   user: toPublicAdmin(admin),
-    // });
-  });
+  );
 };
+
+
+// const db = require("../config/db");
+// const bcrypt = require("bcryptjs");
+// const { setAuthCookie } = require("../utils/authCookie");
+// const { toPublicAdmin } = require("../utils/authUsers");
+// const jwt = require("jsonwebtoken");
+
+// const emailExists = (normalizedEmail, callback) => {
+//   db.query(
+//     "SELECT id FROM admins WHERE email = ? LIMIT 1",
+//     [normalizedEmail],
+//     (err, adminRows) => {
+//       if (err) return callback(err);
+//       if (adminRows.length > 0) return callback(null, true);
+      
+//       db.query(
+//         "SELECT id FROM users WHERE email = ? LIMIT 1",
+//         [normalizedEmail],
+//         (err2, userRows) => {
+//           if (err2) return callback(err2);
+//           callback(null, userRows.length > 0);
+//         }
+//       );
+//     }
+//   );
+// };
+
+// exports.registerAdmin = async (req, res) => {
+//   const { name, email, password } = req.body;
+
+//   if (!name?.trim() || !email || !password) {
+//     return res.status(400).json({ message: "All fields are required" });
+//   }
+
+//   const normalizedEmail = email.trim().toLowerCase();
+
+//   emailExists(normalizedEmail, async (err, exists) => {
+//     if (err) {
+//       return res.status(500).json({ message: "Database error" });
+//     }
+
+//     if (exists) {
+//       return res.status(409).json({ message: "Email already registered" });
+//     }
+
+//     try {
+//       const hashedPassword = await bcrypt.hash(password, 10);
+
+//       const insertSql = `
+//         INSERT INTO admins (name, email, password, status)
+//         VALUES (?, ?, ?, 'active')
+//       `;
+
+//       db.query(
+//         insertSql,
+//         [name.trim(), normalizedEmail, hashedPassword],
+//         (insertErr, result) => {
+//           if (insertErr) {
+//             console.error(insertErr);
+//             return res.status(500).json({ message: "Could not create admin" });
+//           }
+
+//           return res.status(201).json({
+//             message: "Admin registered successfully",
+//             adminId: result.insertId,
+//           });
+//         }
+//       );
+//     } catch {
+//       return res.status(500).json({ message: "Password encryption failed" });
+//     }
+//   });
+// };
+
+// exports.loginAdmin = (req, res) => {
+//   const { email, password } = req.body;
+
+//   if (!email || !password) {
+//     return res.status(400).json({ message: "Email and password required" });
+//   }
+
+//   const normalizedEmail = email.trim().toLowerCase();
+
+//   const sql = `SELECT * FROM admins WHERE email = ? LIMIT 1`;
+
+//   db.query(sql, [normalizedEmail], async (err, result) => {
+//     if (err) {
+//       return res.status(500).json({ message: "Database error" });
+//     }
+
+//     if (result.length === 0) {
+//       return res.status(401).json({ message: "Invalid email or password" });
+//     }
+
+//     const admin = result[0];
+
+//     if (admin.status !== "active") {
+//       return res.status(403).json({ message: "Admin account is not active" });
+//     }
+
+//     const storedPassword = admin.password || "";
+//     let passwordMatch = false;
+
+//     if (storedPassword.startsWith("$2")) {
+//       passwordMatch = await bcrypt.compare(password, storedPassword);
+//     } else {
+//       passwordMatch = storedPassword === password;
+//     }
+
+//     if (!passwordMatch) {
+//       return res.status(401).json({ message: "Invalid email or password" });
+//     }
+
+//     const token = setAuthCookie(res, { id: admin.id, role: "admin" });
+
+// res.json({
+//   token,
+//   user: toPublicAdmin(admin),
+// });
+//     // setAuthCookie(res, { id: admin.id, role: "admin" });
+
+//     // res.json({
+//     //   user: toPublicAdmin(admin),
+//     // });
+//   });
+// };

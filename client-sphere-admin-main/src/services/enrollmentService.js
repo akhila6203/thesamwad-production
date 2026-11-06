@@ -20,6 +20,15 @@ export const enrollmentService = {
     }),
 
   remove: (classId) => axiosClient.delete(ENDPOINTS.ENROLLMENTS.byClass(classId)),
+
+  getVideoProgress: (classId) =>
+  axiosClient.get(ENDPOINTS.ENROLLMENTS.videoProgress(classId)),
+
+saveVideoProgress: (classId, payload) =>
+  axiosClient.post(
+    ENDPOINTS.ENROLLMENTS.videoProgress(classId),
+    payload
+  ),
 };
 
 /** @deprecated use getMyClasses */

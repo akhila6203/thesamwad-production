@@ -208,7 +208,8 @@ export default function Students() {
           </p>
         </div>
 
-        <div className="flex gap-2 flex-wrap">
+        {/* <div className="flex gap-2 flex-wrap"> */}
+        <div className="flex flex-wrap gap-2 w-full sm:w-auto">
           <Button
             variant="outline"
             onClick={handleExport}
@@ -260,8 +261,10 @@ export default function Students() {
 
       <Card>
         <CardContent className="p-0">
-          <div className="p-4 border-b flex flex-col lg:flex-row lg:items-center gap-3 justify-between">
-            <div className="flex flex-col sm:flex-row gap-3 flex-1">
+          <div className="p-3 sm:p-4 border-b border-border flex flex-col lg:flex-row lg:items-center gap-3 justify-between min-w-0">
+          {/* <div className="p-4 border-b flex flex-col lg:flex-row lg:items-center gap-3 justify-between"> */}
+            {/* <div className="flex flex-col sm:flex-row gap-3 flex-1"> */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:flex lg:flex-row gap-3 flex-1 min-w-0">
               <div className="relative max-w-sm w-full">
                 <Search className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
                 <Input
@@ -347,8 +350,11 @@ export default function Students() {
                 : "No students yet. Students appear here when added manually or when they sign in with Google."}
             </p>
           ) : (
+            // <>
+            //   <Table>
             <>
-              <Table>
+  <div className="w-full overflow-x-auto admin-students-table">
+    <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead>Student</TableHead>
@@ -474,14 +480,17 @@ export default function Students() {
                   ))}
                 </TableBody>
               </Table>
+                </div>
 
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 border-t">
+                  <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-3 sm:p-4 border-t border-border min-w-0">
+              {/* <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 border-t"> */}
                 <p className="text-sm text-gray-500">
                   Showing {from}–{to} of {total} student{total !== 1 ? "s" : ""}
                 </p>
 
                 {totalPages > 1 && (
-                  <Pagination className="mx-0 w-auto justify-end">
+                  // <Pagination className="mx-0 w-auto justify-end">
+                  <Pagination className="mx-0 w-full sm:w-auto justify-center sm:justify-end overflow-x-auto">
                     <PaginationContent>
                       <PaginationItem>
                         <PaginationPrevious

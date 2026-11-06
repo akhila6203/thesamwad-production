@@ -65,10 +65,13 @@ export default function SettingsPage() {
     "data-[state=inactive]:text-muted-foreground hover:text-foreground";
 
   return (
-    <div className="mx-auto max-w-7xl space-y-6 px-4 sm:px-6">
+    // <div className="mx-auto max-w-7xl space-y-6 px-4 sm:px-6">
+    <div className="mx-auto w-full min-w-0 max-w-7xl space-y-5 px-3 sm:px-5 lg:px-6">
       <Tabs defaultValue="profile" className="w-full">
-        <div className="border-b overflow-x-auto">
-          <TabsList className="flex h-auto w-max min-w-full justify-start gap-1 bg-transparent p-0 rounded-none">
+        {/* <div className="border-b overflow-x-auto"> */}
+        <div className="w-full min-w-0 overflow-x-auto overscroll-x-contain border-b">
+          <TabsList className="flex h-auto w-max min-w-max justify-start gap-1 rounded-none bg-transparent p-0">
+          {/* <TabsList className="flex h-auto w-max min-w-full justify-start gap-1 bg-transparent p-0 rounded-none"> */}
             <TabsTrigger value="profile" className={tabItem}>
               <User className="h-4 w-4 shrink-0" /> Profile
             </TabsTrigger>
@@ -81,8 +84,10 @@ export default function SettingsPage() {
           </TabsList>
         </div>
 
-        <div className="pt-6">
-          <p className="text-lg font-semibold mb-4">
+        {/* <div className="pt-6"> */}
+        <div className="w-full min-w-0 space-y-4 pt-5">
+          {/* <p className="text-lg font-semibold mb-4"> */}
+          <p className="mb-4 text-base font-semibold leading-relaxed sm:text-lg">
             Manage your workspace, profile and platform preferences.
           </p>
 
@@ -109,7 +114,8 @@ function SectionCard({ title, description, children, footer }) {
       </CardContent>
 
       {footer && (
-        <div className="flex justify-end gap-2 border-t bg-muted/30 px-6 py-3">
+        // <div className="flex justify-end gap-2 border-t bg-muted/30 px-6 py-3">
+        <div className="flex flex-col-reverse gap-2 border-t bg-muted/30 px-3 py-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-end sm:px-6">
           {footer}
         </div>
       )}

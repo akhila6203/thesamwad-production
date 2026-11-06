@@ -23,6 +23,7 @@ import { filterCoursesWithLessons } from "@/utils/courseFilters";
 
 import demo from "../../assets/videos/demo.mp4";
 import { PageWithFooter } from "@/components/layout/PageWithFooter";
+import HomeHighlights from "./HomeHighlights";
 
 // const features = [
 //   { icon: Award, title: "Certified courses", desc: "Industry-recognized certificates upon completion." },
@@ -60,59 +61,94 @@ export default function HomePage() {
   return (
     <PageWithFooter>
     <div className="bg-background text-foreground">
+      <HomeHighlights />
 
       {/* HERO */}
       <section className="relative overflow-hidden">
-        <div className="absolute inset-0 -z-10 bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-slate-900 dark:to-slate-800" />
+        <div className="absolute inset-0 -z-10 bg-gradient-to-br from-[#F0F8F1] via-white to-[#EFF7FC] dark:from-[#30343B] dark:via-[#292D33] dark:to-[#30343B]" />
+<div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 items-center gap-8 lg:gap-12 px-4 sm:px-6 lg:px-8 pt-8 pb-6 sm:pt-10 sm:pb-8">
+{/* <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-10 pt-8 pb-3 sm:pt-10 sm:pb-4 lg:pt-12 lg:pb-4"> */}
+        {/* <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 py-12 sm:py-16 lg:py-20"> */}
+          <div className="flex flex-col items-start gap-5 sm:gap-6">
 
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 py-12 sm:py-16 lg:py-20">
-          <div>
-            <div className="inline-flex items-center gap-2 rounded-full bg-secondary px-3 py-1 text-sm">
-              <Sparkles className="w-4 h-4 text-purple-600" />
-              New: AI for Builders course is live
-            </div>
+  {/* BADGE */}
+  <div className="inline-flex items-center gap-2 rounded-full bg-[#EAF5EC] px-4 py-2 text-base font-medium text-[#246B45]">
+    <Sparkles className="w-5 h-5 text-[#27834B]" />
+    New: AI for Builders course is live
+  </div>
 
-            <h1 className="mt-6 text-3xl sm:text-4xl md:text-5xl font-bold leading-tight">
-              Learning today,
-              <br />
-              <span className="text-purple-600">leading tomorrow.</span>
-            </h1>
+  {/* HEADING */}
+  {/* <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-[1.2] text-[#246B45]"> */}
+    <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-[1.2] text-[#246B45] dark:text-[#8ED3A5]">
+    Learning today,
+    <br />
+    <span className="text-[#2879B5]">
+      leading tomorrow.
+    </span>
+  </h1>
 
-            <p className="mt-4 text-muted-foreground">
-              Mentor-led courses with real projects in web development,
-              data science, design, AI and cloud.
-            </p>
+  {/* DESCRIPTION */}
+  <p className="max-w-xl text-base sm:text-lg leading-8 text-slate-600 dark:text-slate-200">
+    Mentor-led courses with real projects in web development,
+    data science, design, AI and cloud.
+  </p>
 
-            <div className="mt-6 flex gap-4">
-              <a href="#classes" className="bg-purple-600 text-white px-6 py-3 rounded-lg flex items-center gap-2">
-                Browse classes <ChevronRight className="w-4 h-4" />
-              </a>
+  {/* BUTTONS */}
+  <div className="flex flex-wrap items-center gap-3 sm:gap-4">
 
-              {!isLoggedIn && (
-                <Link to="/login" className="rounded-lg border px-6 py-3">
-                  Sign in
-                </Link>
-              )}
-            </div>
+    <a
+      href="#classes"
+      className="bg-[#27834B] hover:bg-[#1E6338] text-white px-6 py-3 rounded-lg flex items-center gap-2 text-base font-semibold transition"
+    >
+      Browse classes
+      <ChevronRight className="w-5 h-5" />
+    </a>
 
-            <div className="mt-6 flex items-center gap-6 text-sm">
-              <div className="flex items-center gap-2">
-                <div className="flex -space-x-2">
-                  {["bg-purple-500", "bg-blue-500", "bg-green-500", "bg-orange-500"].map((c, i) => (
-                    <div key={i} className={`w-7 h-7 rounded-full border-2 border-white ${c}`} />
-                  ))}
-                </div>
-                50,000+ learners
-              </div>
+    {!isLoggedIn && (
+      <Link
+        to="/login"
+        className="rounded-lg border border-[#2879B5] px-6 py-3 text-base font-semibold text-[#2879B5] transition hover:bg-[#2879B5] hover:text-white"
+      >
+        Sign in
+      </Link>
+    )}
 
-              <div className="flex items-center gap-1">
-                {[1, 2, 3, 4, 5].map((i) => (
-                  <Star key={i} className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-                ))}
-                <span className="font-medium">4.8</span>
-              </div>
-            </div>
-          </div>
+  </div>
+
+  {/* LEARNERS AND RATING */}
+  <div className="flex flex-wrap items-center gap-5 sm:gap-7 pt-2">
+
+    <div className="flex items-center gap-3">
+      <div className="flex -space-x-2">
+        {["bg-[#27834B]", "bg-[#2879B5]", "bg-[#E66A50]", "bg-[#D9A441]"].map((c, i) => (
+          <div
+            key={i}
+            className={`w-8 h-8 rounded-full border-2 border-white ${c}`}
+          />
+        ))}
+      </div>
+
+      <span className="text-base font-medium text-slate-700 dark:text-slate-200">
+        50,000+ learners
+      </span>
+    </div>
+
+    <div className="flex items-center gap-1">
+      {[1, 2, 3, 4, 5].map((i) => (
+        <Star
+          key={i}
+          className="w-4 h-4 text-yellow-500 fill-yellow-500"
+        />
+      ))}
+
+     <span className="ml-1 text-base font-semibold text-slate-700 dark:text-slate-200">
+        4.8
+      </span>
+    </div>
+
+  </div>
+
+</div>
 
           <div className="mt-8 lg:mt-0">
             <div className="rounded-2xl bg-card p-3 sm:p-4 shadow-xl">
@@ -182,19 +218,33 @@ export default function HomePage() {
       </section> */}
 
       {/* COURSES */}
-      <section id="classes" className="max-w-7xl mx-auto py-12 sm:py-16">
+      {/* <section id="classes" className="max-w-7xl mx-auto py-12 sm:py-16"> */}
+      {/* <section id="classes" className="max-w-7xl mx-auto pt-8 pb-8 sm:pt-10 sm:pb-10"> */}
+      <section
+  id="classes"
+  className="max-w-7xl mx-auto pt-4 pb-10 sm:pt-5 sm:pb-12 px-4 sm:px-6 lg:px-0"
+>
         <div className="flex justify-between items-end">
           <div>
-            <h2 className="text-3xl font-bold">Skills to transform your career</h2>
+            <h2 className="text-3xl sm:text-4xl font-bold leading-tight text-[#181f20] dark:text-slate-100">
+  Skills to transform your career
+</h2>
+
+<p className="mt-3 max-w-3xl text-base sm:text-lg leading-7 text-slate-600 dark:text-slate-200">
+  Learn in-demand skills through expert-led classes, real-world
+  projects, and industry-focused training.
+</p>
+            {/* <h2 className="text-3xl font-bold">Skills to transform your career</h2>
             <p className="mt-2 text-muted-foreground">
               Learn in-demand skills through expert-led classes, real-world projects, and industry-focused training.
-            </p>
+            </p> */}
           </div>
         </div>
 
         <div className="mt-6">
           {!loading && visiblePool.length > 0 && (
-            <p className="text-sm text-muted-foreground">
+            // <p className="text-sm text-muted-foreground">
+            <p className="text-base text-slate-600">
               {visiblePool.length} published lesson{visiblePool.length !== 1 ? "s" : ""} · topics shown on each card
             </p>
           )}
@@ -216,7 +266,8 @@ export default function HomePage() {
           </p>
         )}
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-8">
+        {/* <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-8"> */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 sm:gap-6 mt-6">
           {visibleCourses.map((c) => (
             <CourseCard key={c.id} course={c} />
           ))}
@@ -235,8 +286,10 @@ export default function HomePage() {
         )}
       </section>
 
-      <section className="mx-auto max-w-7xl py-16">
-        <div className="rounded-2xl px-8 py-14 text-center text-white bg-gradient-to-r from-purple-600 via-fuchsia-600 to-pink-500 shadow-xl">
+      {/* <section className="mx-auto max-w-7xl py-16"> */}
+      <section className="mx-auto max-w-7xl px-4 py-6 sm:py-8">
+        <div className="rounded-2xl px-6 py-10 sm:px-8 sm:py-12 text-center text-white bg-gradient-to-r from-[#27834B] via-[#2879B5] to-[#E66A50] shadow-lg">
+        {/* <div className="rounded-2xl px-8 py-14 text-center text-white bg-gradient-to-r from-purple-600 via-fuchsia-600 to-pink-500 shadow-xl"> */}
           <BookOpen className="mx-auto h-10 w-10 opacity-90" />
           <h3 className="mt-4 text-2xl font-bold sm:text-3xl">
             Start your learning journey today
@@ -248,7 +301,7 @@ export default function HomePage() {
             {!isLoggedIn && (
               <Link
                 to="/login"
-                className="bg-white text-purple-600 px-6 py-3 rounded-lg font-medium shadow hover:scale-105 transition"
+                className="bg-white text-[#2879B5]  px-6 py-3 rounded-lg font-medium shadow hover:scale-105 transition"
               >
                 Get started free
               </Link>

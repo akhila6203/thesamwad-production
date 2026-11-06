@@ -116,9 +116,16 @@ export default function CourseDrawer({
     }
   };
 
+  // return (
+  //   <div className="flex flex-col">
+  //     <div className="p-6 flex-1 overflow-y-auto">{renderStep()}</div>
+  //   </div>
+  // );
   return (
-    <div className="flex flex-col">
-      <div className="p-6 flex-1 overflow-y-auto">{renderStep()}</div>
+  <div className="flex min-h-0 w-full min-w-0 flex-1 flex-col overflow-hidden">
+    <div className="min-h-0 w-full min-w-0 flex-1 overflow-x-hidden overflow-y-auto p-2 sm:p-3 lg:p-4">
+      {renderStep()}
     </div>
-  );
+  </div>
+);
 }

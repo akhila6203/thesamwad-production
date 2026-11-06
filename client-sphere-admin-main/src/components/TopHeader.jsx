@@ -5,6 +5,7 @@ import {
   LogOut,
   Settings,
   BookOpen,
+  Menu,
 } from "lucide-react";
 
 import { useTheme } from "@/contexts/ThemeContext";
@@ -24,7 +25,12 @@ import {
 
 import logo from "../assets/photos/lmslogo2.png";
 
-export function TopHeader() {
+// export function TopHeader() {
+export function TopHeader({
+  collapsed,
+  onMenuClick,
+  showMobileMenu = false,
+}) {
   const { isDark, toggle } = useTheme();
   const navigate = useNavigate();
   const { user, logout } = useAuth();
@@ -76,6 +82,16 @@ if (path.startsWith("/admin/classes/")) {
     <>
       <header className="flex h-full w-full items-center justify-between bg-card/80 px-4 backdrop-blur-md border-b border-border sm:px-6">
         <div className="flex items-center gap-2 sm:gap-4 min-w-[120px]">
+          {isAdmin && showMobileMenu && (
+  <button
+    type="button"
+    onClick={onMenuClick}
+    aria-label="Open admin sidebar"
+    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-border bg-background text-foreground hover:bg-secondary"
+  >
+    <Menu className="h-5 w-5" />
+  </button>
+)}
           {user?.role !== "admin" ? (
             <button
               type="button"
@@ -224,9 +240,9 @@ if (path.startsWith("/admin/classes/")) {
                   <DropdownMenuItem onClick={() => navigate("/my-learning")} className="cursor-pointer gap-2">
                     <BookOpen className="h-4 w-4" /> My learning
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate("/settings?tab=personal")} className="cursor-pointer gap-2">
+                  {/* <DropdownMenuItem onClick={() => navigate("/settings?tab=personal")} className="cursor-pointer gap-2">
                     <Settings className="h-4 w-4" /> Settings
-                  </DropdownMenuItem>
+                  </DropdownMenuItem> */}
                   
                 </>
               )}

@@ -64,6 +64,9 @@ async function syncEnrollmentQuizAggregate(enrollmentId) {
   return { scoreSum, totalSum, latestCompletedAt };
 }
 
+
+
+
 exports.getMyCourses = async (req, res) => {
   try {
     const classLevel = await getUserClassLevel(req.user.id);
@@ -293,12 +296,22 @@ exports.completeQuiz = async (req, res) => {
     const enrollmentId = enrollments[0].id;
     const progress = await getProgressForEnrollment(enrollmentId, courseId);
 
-    if (!progress.courseComplete) {
-      return res.status(403).json({
-        message: "Complete all lessons and materials before starting the quiz",
-        courseComplete: false,
-      });
-    }
+    // if (!progress.courseComplete) {
+    //   return res.status(403).json({
+    //     message: "Complete all lessons and materials before starting the quiz",
+    //     courseComplete: false,
+    //   });
+    // }
+    if (
+  progress.videosCount === 0 ||
+  progress.videosDone < progress.videosCount
+) {
+  return res.status(403).json({
+    message: "Complete all lessons before starting the quiz",
+    videosDone: progress.videosDone,
+    videosCount: progress.videosCount,
+  });
+}
 
     const quizRows = await query(
       "SELECT id, quiz_title FROM course_quizzes WHERE course_id = ? ORDER BY id",
@@ -461,3 +474,331 @@ exports.getRecommended = async (req, res) => {
     res.status(500).json({ message: "Failed to load recommendations" });
   }
 };
+
+function mergeWatchedRanges(ranges, duration) {
+  const maxDuration = Number(duration);
+
+  const sorted = (Array.isArray(ranges) ? ranges : [])
+    .filter(
+      (range) =>
+        Array.isArray(range) &&
+        Number.isFinite(Number(range[0])) &&
+        Number.isFinite(Number(range[1])) &&
+        Number(range[0]) >= 0 &&
+        Number(range[1]) > Number(range[0])
+    )
+    .map(([start, end]) => [
+      Math.max(0, Math.min(maxDuration, Number(start))),
+      Math.max(0, Math.min(maxDuration, Number(end))),
+    ])
+    .filter(([start, end]) => end > start)
+    .sort((a, b) => a[0] - b[0]);
+
+  const merged = [];
+
+  for (const range of sorted) {
+    const last = merged[merged.length - 1];
+
+    if (!last || range[0] > last[1] + 0.25) {
+      merged.push([...range]);
+    } else {
+      last[1] = Math.max(last[1], range[1]);
+    }
+  }
+
+  return merged;
+}
+
+function getWatchedSeconds(ranges) {
+  return ranges.reduce(
+    (total, [start, end]) => total + Math.max(0, end - start),
+    0
+  );
+}
+
+
+exports.getVideoWatchProgress = async (req, res) => {
+  try {
+    const { courseId } = req.params;
+
+    const enrollments = await query(
+      `SELECT id
+       FROM course_enrollments
+       WHERE user_id = ?
+         AND course_id = ?
+         AND status IN ('active', 'completed')
+       LIMIT 1`,
+      [req.user.id, courseId]
+    );
+
+    if (!enrollments.length) {
+      return res.status(403).json({
+        message: "Enroll in this course first",
+      });
+    }
+
+    const rows = await query(
+      `SELECT video_id, current_position_seconds,
+              duration_seconds, watched_ranges,
+              progress_percent, completed
+       FROM course_video_watch_progress
+       WHERE enrollment_id = ?`,
+      [enrollments[0].id]
+    );
+
+    res.json({
+      videoProgress: rows.map((row) => {
+        let watchedRanges = [];
+
+        try {
+          watchedRanges = JSON.parse(row.watched_ranges || "[]");
+        } catch {
+          watchedRanges = [];
+        }
+
+        return {
+          videoId: Number(row.video_id),
+          currentPositionSeconds: Number(row.current_position_seconds) || 0,
+          durationSeconds: Number(row.duration_seconds) || 0,
+          progressPercent: Number(row.progress_percent) || 0,
+          // completed: Boolean(row.completed),
+          completed: Number(row.completed) === 1,
+          watchedRanges,
+        };
+      }),
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      message: "Failed to load video progress",
+    });
+  }
+};
+
+
+exports.saveVideoWatchProgress = async (req, res) => {
+  try {
+    const { courseId } = req.params;
+
+    const {
+      videoId,
+      currentPositionSeconds,
+      durationSeconds,
+      watchedRanges = [],
+      completed: videoCompleted = false,
+    } = req.body || {};
+
+    const id = Number(videoId);
+    const position = Number(currentPositionSeconds);
+    const length = Number(durationSeconds);
+
+    if (
+      !Number.isInteger(id) ||
+      id <= 0 ||
+      !Number.isFinite(position) ||
+      !Number.isFinite(length) ||
+      length <= 0 ||
+      position < 0 ||
+      position > length + 2
+    ) {
+      return res.status(400).json({
+        message: "Valid video progress details are required",
+      });
+    }
+
+    if (!Array.isArray(watchedRanges)) {
+      return res.status(400).json({
+        message: "watchedRanges must be an array",
+      });
+    }
+
+    // Confirm that the video belongs to the requested course.
+    const videoRows = await query(
+      `SELECT id
+       FROM course_videos
+       WHERE id = ? AND course_id = ?
+       LIMIT 1`,
+      [id, courseId]
+    );
+
+    if (!videoRows.length) {
+      return res.status(404).json({
+        message: "Video not found in this course",
+      });
+    }
+
+    // Confirm that the logged-in student is enrolled.
+    const enrollments = await query(
+      `SELECT id, started_at
+       FROM course_enrollments
+       WHERE user_id = ?
+         AND course_id = ?
+         AND status IN ('active', 'completed')
+       LIMIT 1`,
+      [req.user.id, courseId]
+    );
+
+    if (!enrollments.length) {
+      return res.status(403).json({
+        message: "Enroll in this course first",
+      });
+    }
+
+    const enrollmentId = enrollments[0].id;
+
+    const existingRows = await query(
+      `SELECT current_position_seconds,
+              duration_seconds,
+              watched_ranges,
+              completed
+       FROM course_video_watch_progress
+       WHERE enrollment_id = ? AND video_id = ?
+       LIMIT 1`,
+      [enrollmentId, id]
+    );
+
+    const existing = existingRows[0] || null;
+
+    let oldRanges = [];
+
+    try {
+      const parsed = JSON.parse(existing?.watched_ranges || "[]");
+      oldRanges = Array.isArray(parsed) ? parsed : [];
+    } catch {
+      oldRanges = [];
+    }
+
+    /*
+      Keep old watched intervals when the duration is unchanged.
+      If the video duration has changed, clamp old intervals to
+      the new duration rather than allowing invalid percentages.
+    */
+    const validOldRanges = mergeWatchedRanges(oldRanges, length);
+
+    const validIncomingRanges = watchedRanges
+      .filter(
+        (range) =>
+          Array.isArray(range) &&
+          Number.isFinite(Number(range[0])) &&
+          Number.isFinite(Number(range[1])) &&
+          Number(range[0]) >= 0 &&
+          Number(range[1]) > Number(range[0]) &&
+          Number(range[1]) <= length + 2
+      )
+      .map(([start, end]) => [
+        Math.max(0, Number(start)),
+        Math.min(length, Number(end)),
+      ]);
+
+    // Merge old and new intervals. Rewinding cannot reduce progress.
+    const mergedRanges = mergeWatchedRanges(
+      [...validOldRanges, ...validIncomingRanges],
+      length
+    );
+
+    const watchedSeconds = getWatchedSeconds(mergedRanges);
+
+    const progressPercent = Math.min(
+      100,
+      Math.round((watchedSeconds / length) * 100)
+    );
+
+    const furthestWatched = mergedRanges.reduce(
+      (furthest, range) => Math.max(furthest, range[1]),
+      0
+    );
+
+    // Completion is based on actual watched intervals, not a seek.
+    const isCompleted =
+      Boolean(Number(existing?.completed)) ||
+      (
+        videoCompleted === true &&
+        progressPercent >= 90 &&
+        furthestWatched >= length * 0.95
+      );
+
+    const safePosition = Math.min(position, length);
+
+    await query(
+      `INSERT INTO course_video_watch_progress
+        (
+          enrollment_id,
+          video_id,
+          current_position_seconds,
+          duration_seconds,
+          watched_ranges,
+          progress_percent,
+          completed
+        )
+       VALUES (?, ?, ?, ?, ?, ?, ?)
+       ON DUPLICATE KEY UPDATE
+         current_position_seconds = VALUES(current_position_seconds),
+         duration_seconds = VALUES(duration_seconds),
+         watched_ranges = VALUES(watched_ranges),
+         progress_percent = GREATEST(
+           progress_percent,
+           VALUES(progress_percent)
+         ),
+         completed = GREATEST(
+           completed,
+           VALUES(completed)
+         )`,
+      [
+        enrollmentId,
+        id,
+        safePosition,
+        length,
+        JSON.stringify(mergedRanges),
+        progressPercent,
+        isCompleted ? 1 : 0,
+      ]
+    );
+
+    if (!enrollments[0].started_at) {
+      await query(
+        `UPDATE course_enrollments
+         SET started_at = NOW()
+         WHERE id = ? AND started_at IS NULL`,
+        [enrollmentId]
+      );
+    }
+
+    const progress = await getProgressForEnrollment(
+      enrollmentId,
+      courseId
+    );
+
+    if (progress.courseComplete && !progress.quizDone) {
+      await query(
+        `UPDATE course_enrollments
+         SET completed_at = COALESCE(completed_at, NOW())
+         WHERE id = ?`,
+        [enrollmentId]
+      );
+    }
+
+    await syncStudentProfileProgress(req.user.id);
+
+    return res.json({
+      video: {
+        videoId: id,
+        currentPositionSeconds: safePosition,
+        durationSeconds: length,
+        progressPercent: Math.max(
+          progressPercent,
+          Number(existing?.progress_percent) || 0
+        ),
+        completed: isCompleted,
+        watchedRanges: mergedRanges,
+      },
+      progress,
+    });
+  } catch (err) {
+    console.error("saveVideoWatchProgress:", err);
+
+    return res.status(500).json({
+      message: "Failed to save video progress",
+    });
+  }
+};
+

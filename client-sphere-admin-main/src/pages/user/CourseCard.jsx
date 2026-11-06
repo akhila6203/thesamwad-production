@@ -29,39 +29,44 @@ export function CourseCard({ course }) {
           <div className="absolute inset-0 bg-black/10" />
         </div>
 
-        <div className="space-y-2 p-3 sm:p-4">
+        {/* <div className="space-y-2 p-3 sm:p-4"> */}
+        <div className="space-y-3 p-4 sm:p-5">
           <div className="flex flex-wrap items-center gap-2">
             {className && (
-              <span className="inline-flex rounded-md border border-border bg-muted/70 px-2.5 py-1 text-[11px] font-medium text-foreground">
+              <span className="inline-flex rounded-md border border-border bg-muted/70 px-2.5 py-1 text-xs sm:text-sm font-medium text-foreground">
                 {formatClassDisplay(className)}
               </span>
             )}
             {subjectName && (
-              <span className="inline-flex rounded-md border border-border bg-muted/70 px-2.5 py-1 text-[11px] font-medium text-foreground">
+              <span className="inline-flex rounded-md border border-border bg-muted/70 px-2.5 py-1 text-xs sm:text-sm font-medium text-foreground">
                 {subjectName}
               </span>
             )}
           </div>
 
-          <h3 className="text-sm font-semibold leading-tight line-clamp-2 text-blue-600 transition group-hover:text-purple-600 sm:text-base">
+<h3 className="text-base sm:text-lg font-semibold leading-snug line-clamp-2 text-blue-600 dark:text-blue-400 transition group-hover:text-[#2879B5]">
+          {/* <h3 className="text-sm font-semibold leading-tight line-clamp-2 text-blue-600 transition group-hover:text-[#2879B5]  sm:text-base"> */}
             {course.title}
           </h3>
 
-          <p className="line-clamp-2 text-[11px] text-muted-foreground sm:text-xs">
+          {/* <p className="line-clamp-2 text-[11px] text-muted-foreground sm:text-xs"> */}
+          <p className="line-clamp-2 text-sm sm:text-base leading-relaxed text-muted-foreground">
             {course.description}
           </p>
 
-          <p className="text-xs text-muted-foreground">
+          {/* <p className="text-xs text-muted-foreground"> */}
+          <p className="text-sm sm:text-base text-muted-foreground">
             By {course.mentor || course.instructor || "Mentor"}
           </p>
 
-          <div className="flex flex-wrap items-center gap-2 text-[11px] text-muted-foreground sm:gap-3 sm:text-xs">
+          {/* <div className="flex flex-wrap items-center gap-2 text-[11px] text-muted-foreground sm:gap-3 sm:text-xs"> */}
+          <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground sm:gap-3 sm:text-sm">
             <span className="inline-flex items-center gap-1">
-              <Clock className="h-3.5 w-3.5" />
+              <Clock className="h-4 w-4" />
               {timeLabel}
             </span>
             <span className="inline-flex items-center gap-1">
-              <BookOpen className="h-3.5 w-3.5" />
+              <BookOpen className="h-4 w-4" />
               {course.topics ?? course.topicCount ?? course.lessons ?? 0} topics
             </span>
           </div>

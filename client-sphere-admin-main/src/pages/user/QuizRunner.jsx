@@ -181,11 +181,11 @@ export function QuizRunner({ open, onOpenChange, title, questions, onComplete })
             <Progress value={((step + 1) / total) * 100} className="h-2" />
 
             {typeMeta && (
-              <div className="rounded-lg border border-purple-200 bg-purple-50 px-3 py-2 text-xs dark:border-purple-900/60 dark:bg-purple-950/30">
-                <p className="font-semibold text-purple-700 dark:text-purple-300">
+              <div className="rounded-lg border border-[#295373]    bg-[#93adc2]    px-3 py-2 text-xs dark:border-[#2879B5]    dark:bg-[#a9c5da]   ">
+                <p className="font-semibold text-[#181818]    dark:text-[#2879B5]   ">
                   {typeMeta.label}
                 </p>
-                <p className="mt-0.5 text-muted-foreground">{typeMeta.hint}</p>
+                <p className="mt-0.5 text-muted-foreground text-[#212020]">{typeMeta.hint}</p>
               </div>
             )}
 
@@ -260,7 +260,7 @@ export function QuizRunner({ open, onOpenChange, title, questions, onComplete })
               <Button
                 onClick={next}
                 disabled={!canProceed()}
-                className="bg-purple-600 text-white hover:bg-purple-700"
+                className="bg-[#2879B5]    text-white hover:bg-[#2879B5]   "
               >
                 {step + 1 >= total ? "Submit" : "Next"}
               </Button>

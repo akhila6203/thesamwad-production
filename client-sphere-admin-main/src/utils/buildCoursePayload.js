@@ -1,22 +1,40 @@
 /** Strip File blobs; keep only fields the API persists */
 export function buildClassPayload(course) {
-  const videos = (course.videos || [])
+  // const videos = (course.videos || [])
+  //   .filter((v) => v?.title?.trim())
+  //   .map((v) => ({
+  //     title: v.title.trim(),
+  //     url: v.url || "",
+  //     duration: v.duration || "",
+  //     uploadedAt: v.uploadedAt || new Date().toISOString(),
+  //   }));
+    const videos = (course.videos || [])
     .filter((v) => v?.title?.trim())
     .map((v) => ({
+      id: v.id ?? v.databaseVideoId ?? v.database_video_id ?? null,
       title: v.title.trim(),
       url: v.url || "",
       duration: v.duration || "",
       uploadedAt: v.uploadedAt || new Date().toISOString(),
     }));
 
-  const materials = (course.materials || [])
+      const materials = (course.materials || [])
     .filter((m) => m?.title?.trim())
     .map((m) => ({
+      id: m.id ?? m.materialId ?? null,
       title: m.title.trim(),
       type: m.type || "PDF",
       url: m.url || "",
       uploadedAt: m.uploadedAt || new Date().toISOString(),
     }));
+  // const materials = (course.materials || [])
+  //   .filter((m) => m?.title?.trim())
+  //   .map((m) => ({
+  //     title: m.title.trim(),
+  //     type: m.type || "PDF",
+  //     url: m.url || "",
+  //     uploadedAt: m.uploadedAt || new Date().toISOString(),
+  //   }));
 
   const quizzes = (course.quizzes || []).length
     ? course.quizzes

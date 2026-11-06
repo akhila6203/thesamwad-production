@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom";
+
 import {
-  Github,
-  Twitter,
+  Instagram,
+  Facebook,
   Linkedin,
   Mail,
   Phone,
@@ -22,7 +23,7 @@ export default function Footer() {
               <img
                 src={logo}
                 alt="LMS Logo"
-                className="w-36 h-auto object-contain"
+                className="w-56 h-auto object-contain"
               />
             </Link>
 
@@ -70,9 +71,15 @@ export default function Footer() {
 
             <div className="space-y-4 text-muted-foreground">
 
+              {/* <div className="flex items-center gap-3">
+                <Phone size={18} />
+                <span>+91 6304003951</span>
+              </div> */}
               <div className="flex items-center gap-3">
                 <Phone size={18} />
-                <span>+91 9999999999</span>
+                <a href="tel:+916304003951" className="hover:text-primary transition">
+                  +91 6304003951
+                </a>
               </div>
 
               <div className="flex items-center gap-3">
@@ -94,34 +101,36 @@ export default function Footer() {
             {/* Social Icons */}
             <div className="flex gap-4 mt-8">
 
-              <a
-                href="#"
+               <a
+                href="https://www.instagram.com/samwadwithajazhashmi/"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Instagram"
                 className="w-10 h-10 rounded-full border border-border flex items-center justify-center hover:bg-primary hover:text-white transition"
               >
-                <Github size={18} />
+                <Instagram size={18} />
               </a>
 
-              <a
-                href="#"
+               <a
+                href="https://www.facebook.com/profile.php?id=61594189070996"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Facebook"
                 className="w-10 h-10 rounded-full border border-border flex items-center justify-center hover:bg-primary hover:text-white transition"
               >
-                <Twitter size={18} />
+                <Facebook size={18} />
               </a>
 
+              {/* LinkedIn */}
               <a
-                href="#"
+                href="https://www.linkedin.com/"
+                aria-label="LinkedIn"
                 className="w-10 h-10 rounded-full border border-border flex items-center justify-center hover:bg-primary hover:text-white transition"
               >
                 <Linkedin size={18} />
               </a>
 
-              <a
-                href="#"
-                className="w-10 h-10 rounded-full border border-border flex items-center justify-center hover:bg-primary hover:text-white transition"
-              >
-                <Mail size={18} />
-              </a>
-
+            
             </div>
           </div>
         </div>

@@ -9,6 +9,8 @@ import PronunciationSearch from "@/components/PronunciationSearch";
 import { useAuth } from "@/contexts/AuthContext";
 import { subjectService } from "@/services/subjectService";
 
+import WhatsAppButton from "@/components/WhatsAppButton";
+
 export default function UserLayout({ children }) {
   const location = useLocation();
   const navigate = useNavigate();
@@ -64,7 +66,7 @@ export default function UserLayout({ children }) {
                   onClick={() => navigate("/dashboard")}
                   className={`shrink-0 whitespace-nowrap border-b-2 pb-1 text-sm font-medium transition ${
                     isAllSubjectsActive
-                      ? "border-purple-600 text-purple-700"
+                      ? "border-[#8fa5b7] text-[#2879B5]   "
                       : "border-transparent text-muted-foreground hover:text-foreground"
                   }`}
                 >
@@ -79,7 +81,7 @@ export default function UserLayout({ children }) {
                     className={`shrink-0 whitespace-nowrap border-b-2 pb-1 text-sm font-medium transition ${
                       activeSubject === subject &&
                       location.pathname.startsWith("/classes")
-                        ? "border-purple-600 text-purple-700"
+                        ? "border-[#5e94be] text-[#1589e2]   "
                         : "border-transparent text-muted-foreground hover:text-foreground"
                     }`}
                   >
@@ -104,6 +106,8 @@ export default function UserLayout({ children }) {
       </div>
 
       <PronunciationSearch open={pronunciationOpen} onOpenChange={setPronunciationOpen} />
+
+      <WhatsAppButton />
     </div>
   );
 }

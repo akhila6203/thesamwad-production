@@ -166,12 +166,14 @@ export default function AdminCourses() {
           Loading classes...
         </p>
       ) : (
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        // <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
           {filtered.map((course) => (
             <div
               key={course.id}
               onClick={() => navigate(`/admin/classes/${course.id}`)}
-              className="cursor-pointer overflow-hidden rounded-xl bg-card shadow transition hover:shadow-lg"
+              className="min-w-0 cursor-pointer overflow-hidden rounded-xl border border-border bg-card text-card-foreground shadow-sm transition hover:shadow-lg"
+              // className="cursor-pointer overflow-hidden rounded-xl bg-card shadow transition hover:shadow-lg"
             >
               <div className="relative h-44 overflow-hidden">
                 {course.thumbnail ? (
@@ -206,7 +208,8 @@ export default function AdminCourses() {
                   {courseSubject(course) || "—"}
                 </p>
 
-                <h2 className="mb-2 text-xl font-semibold leading-snug text-blue-600">
+                {/* <h2 className="mb-2 text-xl font-semibold leading-snug text-blue-600"> */}
+                <h2 className="mb-2 break-words text-lg font-semibold leading-snug text-primary sm:text-xl">
                   {course.title}
                 </h2>
 

@@ -80,7 +80,7 @@ export default function Header() {
   return (
     <>
       <header className="fixed top-0 left-0 w-full z-10 border-b bg-card/95 shadow-sm backdrop-blur">
-        <div className="max-w-7xl mx-auto flex items-center justify-between px-2 sm:px-3 py-3">
+        <div className="max-w-7xl mx-auto flex items-center justify-between px-1.5 sm:px-2 py-2">
           <div
             onClick={() => navigate("/")}
             className="flex items-center gap-2 cursor-pointer"
@@ -88,7 +88,7 @@ export default function Header() {
             <img
               src={logo}
               alt="LMS"
-              className="w-20 h-16 object-contain"
+              className="w-24 h-16 object-contain"
               // className="h-16 sm:h-20 md:h-12 w-auto object-contain"
             />
           </div>
@@ -101,7 +101,7 @@ export default function Header() {
             <HeaderSearch variant="mobile-only-icon" className="md:hidden" />
             <button
               onClick={() => navigate("/homeclasses")}
-              className="hidden md:flex items-center gap-1 text-sm font-medium"
+              className="hidden md:flex items-center gap-1 text-lg font-medium"
             >
               <BookOpen className="h-4 w-4" />
               Classes
@@ -118,15 +118,15 @@ export default function Header() {
                 </button>
             )}
 
-            <Link to="/about" className="hidden md:block text-sm">
+            <Link to="/about" className="hidden md:block text-lg">
               About
             </Link>
 
             <button
               onClick={toggle}
-              className="flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground transition hover:bg-secondary hover:text-foreground"
+              className="flex h-10 w-10 items-center justify-center rounded-full text-muted-foreground transition hover:bg-secondary hover:text-foreground"
             >
-              {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+              {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
             </button>
 
             <button
@@ -139,9 +139,9 @@ export default function Header() {
             {!user || isAdmin ? (
               <button
                 onClick={() => navigate("/login")}
-                className="bg-gradient-to-r from-purple-600 to-indigo-500 text-white px-2 py-2 rounded-lg text-sm shadow"
+                className="bg-gradient-to-r from-orange-600 to-orange-500 text-white px-2 py-2 rounded-lg text-sm shadow"
               >
-                Login
+               Student Login
               </button>
             ) : (
               <DropdownMenu>

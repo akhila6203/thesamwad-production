@@ -117,21 +117,33 @@ export default function SubjectSelect({
 
   return (
     <div className={className} ref={containerRef}>
-      {label && <label className="text-sm text-gray-600">{label}</label>}
+      {label && (
+  <label className="text-sm text-foreground">
+    {label}
+  </label>
+)}
+      {/* {label && <label className="text-sm text-gray-600">{label}</label>} */}
 
       <div className="relative mt-1">
         <button
           type="button"
           disabled={disabled}
           onClick={() => !disabled && setOpen((o) => !o)}
-          className="flex w-full items-center justify-between rounded-lg border px-3 py-2 text-left disabled:bg-gray-100"
+          className="flex w-full items-center justify-between rounded-lg border border-input bg-background text-foreground px-3 py-2 text-left disabled:bg-muted"
+          // className="flex w-full items-center justify-between rounded-lg border px-3 py-2 text-left disabled:bg-gray-100"
         >
-          <span className={value ? "text-gray-900" : "text-gray-400"}>{displayLabel}</span>
+          <span className={value ? 
+            // "text-gray-900" : "text-gray-400"
+            "text-foreground" : "text-muted-foreground"
+            }>{displayLabel}</span>
           <ChevronDown className="h-4 w-4 shrink-0 text-gray-400" />
         </button>
 
         {open && (
-          <div className="absolute z-50 mt-1 w-full rounded-lg border bg-white shadow-lg">
+          <div 
+          // className="absolute z-50 mt-1 w-full rounded-lg border bg-white shadow-lg"
+          className="absolute z-50 mt-1 w-full rounded-lg border border-border bg-card text-card-foreground shadow-lg"
+          >
             <ul className="max-h-56 overflow-y-auto py-1">
               {subjects.map((subject) => (
                 <li key={subject.id} className="group">
@@ -164,16 +176,22 @@ export default function SubjectSelect({
                       </button>
                     </div>
                   ) : (
-                    <div className="flex items-center justify-between px-2 py-1.5 hover:bg-gray-50">
+                    <div className="flex items-center justify-between px-2 py-1.5 hover:bg-muted">
+                     {/* <div className="flex items-center justify-between px-2 py-1.5 hover:bg-gray-50"> */}
                       <button
                         type="button"
                         onClick={() => {
                           onChange(subject.name);
                           setOpen(false);
                         }}
+                        // className={`flex-1 text-left text-sm ${
+                        //   value === subject.name ? "font-medium text-blue-600" : "text-gray-700"
+                        // }`}
                         className={`flex-1 text-left text-sm ${
-                          value === subject.name ? "font-medium text-blue-600" : "text-gray-700"
-                        }`}
+  value === subject.name
+    ? "font-medium text-primary"
+    : "text-foreground"
+}`}
                       >
                         {subject.name}
                       </button>
@@ -187,7 +205,8 @@ export default function SubjectSelect({
                             setEditValue(subject.name);
                             setAddMode(false);
                           }}
-                          className="rounded p-1 text-gray-500 hover:bg-gray-100 hover:text-blue-600"
+                          className="rounded p-1 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+                          // className="rounded p-1 text-gray-500 hover:bg-gray-100 hover:text-blue-600"
                         >
                           <Pencil className="h-3.5 w-3.5" />
                         </button>
@@ -198,7 +217,8 @@ export default function SubjectSelect({
                             e.stopPropagation();
                             handleDelete(subject);
                           }}
-                          className="rounded p-1 text-gray-500 hover:bg-red-50 hover:text-red-600"
+                          className="rounded p-1 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+                          // className="rounded p-1 text-gray-500 hover:bg-red-50 hover:text-red-600"
                         >
                           <Trash2 className="h-3.5 w-3.5" />
                         </button>
@@ -208,7 +228,8 @@ export default function SubjectSelect({
                 </li>
               ))}
 
-              <li className="border-t">
+              {/* <li className="border-t"> */}
+              <li className="border-t border-border">
                 {addMode ? (
                   <div className="px-2 py-2">
                     <input
@@ -226,7 +247,8 @@ export default function SubjectSelect({
                         if (addValue.trim()) persistNewSubject(addValue);
                       }}
                       placeholder="Enter new subject name"
-                      className="w-full rounded-lg border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-purple-500"
+                      className="w-full rounded-lg border border-input bg-background text-foreground placeholder:text-muted-foreground px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary"
+                      // className="w-full rounded-lg border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-purple-500"
                       autoFocus
                     />
                   </div>
@@ -237,7 +259,8 @@ export default function SubjectSelect({
                       setAddMode(true);
                       setEditingId(null);
                     }}
-                    className="w-full px-3 py-2 text-left text-sm text-blue-600 hover:bg-blue-50"
+                    className="w-full px-3 py-2 text-left text-sm text-primary hover:bg-muted"
+                    // className="w-full px-3 py-2 text-left text-sm text-blue-600 hover:bg-blue-50"
                   >
                     Add
                   </button>

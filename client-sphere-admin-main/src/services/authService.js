@@ -27,8 +27,8 @@ export const authService = {
   adminLogin: (credentials) =>
     axiosClient.post(ENDPOINTS.AUTH.ADMIN_LOGIN, credentials),
 
-  adminRegister: (payload) =>
-    axiosClient.post(ENDPOINTS.AUTH.ADMIN_REGISTER, payload),
+  // adminRegister: (payload) =>
+  //   axiosClient.post(ENDPOINTS.AUTH.ADMIN_REGISTER, payload),
 
   googleLogin: (payload) =>
     axiosClient.post(ENDPOINTS.AUTH.GOOGLE_LOGIN, payload),

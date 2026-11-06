@@ -46,24 +46,29 @@ export default function EditStudentModal({ student, onClose, onSuccess }) {
 
   return (
     <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 p-4">
-      <div className="bg-white w-full max-w-lg rounded-xl p-6 max-h-[90vh] overflow-y-auto">
+      <div className="bg-white dark:bg-card text-gray-900 dark:text-foreground border border-transparent dark:border-border w-full max-w-lg rounded-xl p-6 max-h-[90vh] overflow-y-auto shadow-xl">
+      {/* <div className="bg-white w-full max-w-lg rounded-xl p-6 max-h-[90vh] overflow-y-auto"> */}
         <h2 className="text-lg font-semibold mb-1">Edit student</h2>
-        <p className="text-sm text-gray-500 mb-4">
+        {/* <p className="text-sm text-gray-500 mb-4"> */}
+        <p className="text-sm text-gray-500 dark:text-muted-foreground mb-4">
           Update student details. Changes are saved to the same user record.
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="text-sm text-gray-600">Full name</label>
+            {/* <label className="text-sm text-gray-600">Full name</label> */}
+            <label className="text-sm text-gray-600 dark:text-muted-foreground">Full name</label>
             <input
-              className="w-full border rounded-lg px-3 py-2 mt-1"
+              // className="w-full border rounded-lg px-3 py-2 mt-1"
+              className="w-full border border-gray-300 dark:border-input bg-white dark:bg-background text-gray-900 dark:text-foreground placeholder:text-gray-400 dark:placeholder:text-muted-foreground rounded-lg px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-purple-500"
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
             />
           </div>
           <div>
-            <label className="text-sm text-gray-600">Email</label>
+            {/* <label className="text-sm text-gray-600">Email</label> */}
+            <label className="text-sm text-gray-600 dark:text-muted-foreground">Email</label>
             <input
               type="email"
               className="w-full border rounded-lg px-3 py-2 mt-1"
@@ -75,7 +80,8 @@ export default function EditStudentModal({ student, onClose, onSuccess }) {
           <ClassSelect value={classLevel} onChange={setClassLevel} />
           <SchoolSelect value={school} onChange={setSchool} />
           <div className="flex justify-end gap-3 pt-2">
-            <button type="button" onClick={onClose} disabled={loading}>
+            <button type="button" onClick={onClose} disabled={loading}
+            className="rounded-lg border border-border px-4 py-2 text-foreground hover:bg-muted transition">
               Cancel
             </button>
             <button

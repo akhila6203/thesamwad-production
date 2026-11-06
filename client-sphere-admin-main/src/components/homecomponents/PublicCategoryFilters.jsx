@@ -23,7 +23,8 @@ export default function PublicCategoryFilters({
             onClick={() => onCategoryChange(c)}
             className={`pb-2 whitespace-nowrap text-sm ${
               activeCategory === c
-                ? "border-b-2 border-purple-600 text-foreground font-medium"
+                ? "border-b-2 border-[#2879B5] text-foreground font-medium"
+                
                 : "text-muted-foreground"
             }`}
           >
@@ -32,7 +33,7 @@ export default function PublicCategoryFilters({
         ))}
       </div>
 
-      {showSubCategories && (
+      {/* {showSubCategories && (
         <div className="flex gap-2 flex-wrap">
           {subCategories.map((sub) => (
             <button
@@ -49,7 +50,27 @@ export default function PublicCategoryFilters({
             </button>
           ))}
         </div>
-      )}
+      )} */}
+      
+{showSubCategories && (
+  <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+    {subCategories.map((sub) => (
+      <button
+        key={sub}
+        type="button"
+        onClick={() => onSubCategoryChange(sub)}
+        className={`w-auto whitespace-nowrap rounded-lg px-4 py-2 text-sm font-medium border transition ${
+          activeSubCategory === sub
+            ? "bg-[#2879B5] text-white border-[#c4c0c0]"
+            : "bg-white dark:bg-card text-gray-600 dark:text-slate-200 border-gray-200 dark:border-border hover:border-[#b3d1e8]"
+        }`}
+      >
+        {sub}
+      </button>
+    ))}
+  </div>
+)}
+
     </div>
   );
 }

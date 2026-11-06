@@ -1,51 +1,187 @@
 const { query } = require("./dbQuery");
 
-async function getProgressForEnrollment(enrollmentId, courseId) {
-  const videos = await query(
-    "SELECT id, title, duration, sort_order FROM course_videos WHERE course_id = ? ORDER BY sort_order",
-    [courseId]
-  );
-  const materials = await query(
-    "SELECT id, title FROM course_materials WHERE course_id = ? ORDER BY sort_order",
-    [courseId]
-  );
-  const quizzes = await query(
-    "SELECT id, quiz_title FROM course_quizzes WHERE course_id = ? ORDER BY id",
-    [courseId]
-  );
+// async function getProgressForEnrollment(enrollmentId, courseId) {
+//   const videos = await query(
+//     "SELECT id, title, duration, sort_order FROM course_videos WHERE course_id = ? ORDER BY sort_order",
+//     [courseId]
+//   );
+//   const materials = await query(
+//     "SELECT id, title FROM course_materials WHERE course_id = ? ORDER BY sort_order",
+//     [courseId]
+//   );
+//   const quizzes = await query(
+//     "SELECT id, quiz_title FROM course_quizzes WHERE course_id = ? ORDER BY id",
+//     [courseId]
+//   );
   
 
+//   const doneRows = await query(
+//     "SELECT lesson_key, lesson_type FROM course_lesson_progress WHERE enrollment_id = ?",
+//     [enrollmentId]
+//   );
+//   const doneSet = new Set(doneRows.map((r) => r.lesson_key));
+
+//   let videosDone = 0;
+//   let materialsDone = 0;
+
+//   videos.forEach((v, i) => {
+//     const key = `video:${v.id || i + 1}`;
+//     if (doneSet.has(key) || doneSet.has(`video:${i + 1}`)) videosDone += 1;
+//   });
+//   materials.forEach((m, i) => {
+//     const key = `material:${m.id || i + 1}`;
+//     if (doneSet.has(key) || doneSet.has(`material:${i + 1}`)) materialsDone += 1;
+//   });
+
+//   const contentUnits = videos.length + materials.length;
+//   const completedContent = videosDone + materialsDone;
+//   const percent =
+//     contentUnits > 0
+//       ? Math.min(100, Math.round((completedContent / contentUnits) * 100))
+//       : 0;
+
+//   const courseComplete =
+//     videos.length === videosDone &&
+//     materials.length === materialsDone &&
+//     contentUnits > 0;
+
+//   const legacyAllQuizDone = doneSet.has("quiz:all");
+//   const completedQuizIds = new Set(
+//     [...doneSet]
+//       .filter((key) => key.startsWith("quiz:") && key !== "quiz:all")
+//       .map((key) => key.slice("quiz:".length))
+//   );
+
+//   const quizDone =
+//     quizzes.length === 0
+//       ? legacyAllQuizDone
+//       : quizzes.every(
+//           (q) =>
+//             completedQuizIds.has(String(q.id)) ||
+//             (legacyAllQuizDone && quizzes.length === 1)
+//         );
+
+//   return {
+//     totalUnits: contentUnits,
+//     completedUnits: completedContent,
+//     percent: quizDone ? 100 : percent,
+//     courseComplete,
+//     quizDone,
+//     videosCount: videos.length,
+//     materialsCount: materials.length,
+//     quizzesCount: quizzes.length,
+//   };
+// }
+
+
+async function getProgressForEnrollment(enrollmentId, courseId) {
+  const videos = await query(
+    `SELECT id, title, duration, sort_order
+     FROM course_videos
+     WHERE course_id = ?
+     ORDER BY sort_order`,
+    [courseId]
+  );
+
+  const materials = await query(
+    `SELECT id, title
+     FROM course_materials
+     WHERE course_id = ?
+     ORDER BY sort_order`,
+    [courseId]
+  );
+
+  const quizzes = await query(
+    `SELECT id, quiz_title
+     FROM course_quizzes
+     WHERE course_id = ?
+     ORDER BY id`,
+    [courseId]
+  );
+
   const doneRows = await query(
-    "SELECT lesson_key, lesson_type FROM course_lesson_progress WHERE enrollment_id = ?",
+    `SELECT lesson_key, lesson_type
+     FROM course_lesson_progress
+     WHERE enrollment_id = ?`,
     [enrollmentId]
   );
+
   const doneSet = new Set(doneRows.map((r) => r.lesson_key));
 
+  // Read saved watch progress for every video in this enrollment.
+  const watchRows = await query(
+    `SELECT video_id, progress_percent, completed
+     FROM course_video_watch_progress
+     WHERE enrollment_id = ?`,
+    [enrollmentId]
+  );
+
+  const watchMap = new Map(
+    watchRows.map((row) => [Number(row.video_id), row])
+  );
+
   let videosDone = 0;
+  let videoProgressUnits = 0;
   let materialsDone = 0;
 
-  videos.forEach((v, i) => {
-    const key = `video:${v.id || i + 1}`;
-    if (doneSet.has(key) || doneSet.has(`video:${i + 1}`)) videosDone += 1;
+  videos.forEach((video, index) => {
+    const videoId = Number(video.id);
+    const watch = watchMap.get(videoId);
+
+    // Support existing lesson-completion records too.
+    const lessonDone =
+      doneSet.has(`video:${video.id}`) ||
+      doneSet.has(`video:${index + 1}`);
+
+    const isVideoComplete =
+      lessonDone || Boolean(Number(watch?.completed));
+
+    // Each video contributes a fraction of one unit according
+    // to its saved watch percentage.
+    let watchedFraction = isVideoComplete
+      ? 1
+      : Math.min(
+          1,
+          Math.max(0, Number(watch?.progress_percent || 0) / 100)
+        );
+
+    if (isVideoComplete) {
+      videosDone += 1;
+      watchedFraction = 1;
+    }
+
+    videoProgressUnits += watchedFraction;
   });
-  materials.forEach((m, i) => {
-    const key = `material:${m.id || i + 1}`;
-    if (doneSet.has(key) || doneSet.has(`material:${i + 1}`)) materialsDone += 1;
+
+  materials.forEach((material, index) => {
+    const isDone =
+      doneSet.has(`material:${material.id}`) ||
+      doneSet.has(`material:${index + 1}`);
+
+    if (isDone) materialsDone += 1;
   });
 
   const contentUnits = videos.length + materials.length;
-  const completedContent = videosDone + materialsDone;
+
+  // Videos can contribute partial units; materials remain
+  // complete/incomplete as in the existing functionality.
+  const completedContent = videoProgressUnits + materialsDone;
+
   const percent =
     contentUnits > 0
-      ? Math.min(100, Math.round((completedContent / contentUnits) * 100))
+      ? Math.min(
+          100,
+          Math.round((completedContent / contentUnits) * 100)
+        )
       : 0;
 
   const courseComplete =
-    videos.length === videosDone &&
-    materials.length === materialsDone &&
+    videosDone === videos.length &&
+    materialsDone === materials.length &&
     contentUnits > 0;
 
   const legacyAllQuizDone = doneSet.has("quiz:all");
+
   const completedQuizIds = new Set(
     [...doneSet]
       .filter((key) => key.startsWith("quiz:") && key !== "quiz:all")
@@ -56,8 +192,8 @@ async function getProgressForEnrollment(enrollmentId, courseId) {
     quizzes.length === 0
       ? legacyAllQuizDone
       : quizzes.every(
-          (q) =>
-            completedQuizIds.has(String(q.id)) ||
+          (quiz) =>
+            completedQuizIds.has(String(quiz.id)) ||
             (legacyAllQuizDone && quizzes.length === 1)
         );
 
@@ -68,10 +204,13 @@ async function getProgressForEnrollment(enrollmentId, courseId) {
     courseComplete,
     quizDone,
     videosCount: videos.length,
+    videosDone,
+    videoProgressUnits,
     materialsCount: materials.length,
     quizzesCount: quizzes.length,
   };
 }
+
 
 async function getUserClassLevel(userId) {
   const rows = await query(

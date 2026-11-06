@@ -89,7 +89,8 @@ export default function Step5({ data = {}, onNext, setStep }) {
   }
 
   return (
-    <div className="max-w-5xl mx-auto space-y-8">
+    // <div className="max-w-5xl mx-auto space-y-8">
+    <div className="mx-auto w-full min-w-0 max-w-5xl space-y-5 sm:space-y-8">
       <div>
         <h1 className="text-2xl font-semibold">Class Preview</h1>
         <p className="text-gray-500 text-sm">
@@ -110,8 +111,10 @@ export default function Step5({ data = {}, onNext, setStep }) {
         </span>
       </div>
 
-      <div className="bg-white rounded-2xl shadow p-6 space-y-6">
-        <div className="flex gap-6 items-start">
+      {/* <div className="bg-white rounded-2xl shadow p-6 space-y-6"> */}
+      <div className="min-w-0 space-y-5 rounded-2xl border border-border bg-card p-3 text-card-foreground shadow-sm sm:space-y-6 sm:p-5 lg:p-6">
+        {/* <div className="flex gap-6 items-start"> */}
+        <div className="flex min-w-0 flex-col items-start gap-4 sm:flex-row sm:gap-6">
           {data?.thumbnail && (
             <img
               src={
@@ -120,7 +123,7 @@ export default function Step5({ data = {}, onNext, setStep }) {
                   : data.thumbnail
               }
               alt="Class thumbnail"
-              className="w-48 h-28 object-cover rounded-lg"
+              className="h-40 w-full max-w-full rounded-lg object-cover sm:h-28 sm:w-48"
             />
           )}
 
@@ -128,7 +131,8 @@ export default function Step5({ data = {}, onNext, setStep }) {
             <h2 className="text-xl font-bold">{data.title || "—"}</h2>
             <p className="text-gray-500">{data.description || "—"}</p>
 
-            <div className="text-sm text-gray-600 grid grid-cols-2 gap-2 mt-2">
+            {/* <div className="text-sm text-gray-600 grid grid-cols-2 gap-2 mt-2"> */}
+            <div className="mt-2 grid min-w-0 grid-cols-1 gap-2 break-words text-sm text-muted-foreground sm:grid-cols-2">
               <p>
                 <b>Class:</b> {data.classLevel || data.category || "—"}
               </p>
@@ -149,7 +153,8 @@ export default function Step5({ data = {}, onNext, setStep }) {
               {videos.map((v, i) => (
                 <div
                   key={i}
-                  className="border rounded-lg p-3 flex justify-between gap-4"
+                  className="flex min-w-0 flex-col gap-2 rounded-lg border border-border p-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4"
+                  // className="border rounded-lg p-3 flex justify-between gap-4"
                 >
                   <div className="min-w-0">
                     <p className="font-medium">{v.title}</p>
@@ -212,7 +217,8 @@ export default function Step5({ data = {}, onNext, setStep }) {
           )}
         </div>
 
-        <div className="flex justify-between pt-6">
+        {/* <div className="flex justify-between pt-6"> */}
+        <div className="flex flex-col-reverse gap-2 pt-5 sm:flex-row sm:justify-between sm:pt-6">
           <button
             type="button"
             onClick={() => setStep((prev) => prev - 1)}

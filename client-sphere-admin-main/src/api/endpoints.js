@@ -7,7 +7,7 @@ const ENDPOINTS = {
     LOGIN: "/auth/login",
     GOOGLE_LOGIN: "/auth/google-login",
     ADMIN_LOGIN: "/auth/admin/login",
-    ADMIN_REGISTER: "/auth/admin/register",
+    // ADMIN_REGISTER: "/auth/admin/register",
     ME: "/auth/me",
     LOGOUT: "/auth/logout",
   },
@@ -75,6 +75,8 @@ HOME_VIDEO: {
     progress: (classId) => `/learner/enrollments/classes/${classId}/progress`,
     quizComplete: (classId) => `/learner/enrollments/classes/${classId}/quiz-complete`,
     byClass: (classId) => `/learner/enrollments/classes/${classId}`,
+    videoProgress: (classId) =>
+     `/learner/enrollments/classes/${classId}/video-progress`,
   },
   UPLOAD: {
     VIDEO: "/upload/video",
@@ -84,6 +86,7 @@ HOME_VIDEO: {
     BASE: "/materials",
     byId: (sourceType, id) => `/materials/${sourceType}/${id}`,
   },
+  
 };
 
 export default ENDPOINTS;

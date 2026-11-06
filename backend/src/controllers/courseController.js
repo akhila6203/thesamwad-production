@@ -82,11 +82,18 @@ async function fetchCourseFullById(id) {
     [id]
   );
 
+  // const materials = await query(
+  //   `SELECT title, type, url, uploaded_at
+  //    FROM course_materials WHERE course_id = ? ORDER BY sort_order`,
+  //   [id]
+  // );
   const materials = await query(
-    `SELECT title, type, url, uploaded_at
-     FROM course_materials WHERE course_id = ? ORDER BY sort_order`,
-    [id]
-  );
+  `SELECT id, title, type, url, uploaded_at
+   FROM course_materials
+   WHERE course_id = ?
+   ORDER BY sort_order`,
+  [id]
+);
 
   const quizRows = await query(
     "SELECT id, quiz_title FROM course_quizzes WHERE course_id = ? ORDER BY id",
@@ -111,12 +118,19 @@ async function fetchCourseFullById(id) {
   return {
     ...mapCourseRow(courseRows[0]),
     videos: videos.map(mapVideoRow),
+    // materials: materials.map((m) => ({
+    //   title: m.title,
+    //   type: m.type,
+    //   url: m.url,
+    //   uploadedAt: m.uploaded_at,
+    // })),
     materials: materials.map((m) => ({
-      title: m.title,
-      type: m.type,
-      url: m.url,
-      uploadedAt: m.uploaded_at,
-    })),
+  id: m.id,
+  title: m.title,
+  type: m.type,
+  url: m.url,
+  uploadedAt: m.uploaded_at,
+})),
     quizzes,
   };
 }
@@ -401,6 +415,185 @@ exports.deleteCourse = async (req, res) => {
   }
 };
 
+async function saveCourseVideos(courseId, videos) {
+  const existingRows = await query(
+    `SELECT id, title, url, duration, uploaded_at
+     FROM course_videos
+     WHERE course_id = ?
+     ORDER BY sort_order, id`,
+    [courseId]
+  );
+
+  const retainedIds = [];
+
+  for (let i = 0; i < videos.length; i++) {
+    const video = videos[i];
+
+    if (!video?.title?.trim()) continue;
+
+    const uploadedAt = video.uploadedAt
+      ? new Date(video.uploadedAt)
+      : new Date();
+
+    // Prefer the original database ID when the admin form sends it.
+    let existingId = Number(
+      video.id ?? video.databaseVideoId ?? video.database_video_id
+    );
+
+    let existing = existingId
+      ? existingRows.find((row) => Number(row.id) === existingId)
+      : null;
+
+    // For older admin payloads without IDs, match the same video by URL.
+    if (!existing && video.url) {
+      existing = existingRows.find(
+        (row) =>
+          !retainedIds.includes(Number(row.id)) &&
+          String(row.url || "") === String(video.url)
+      );
+    }
+
+    if (existing) {
+      existingId = Number(existing.id);
+
+      await query(
+        `UPDATE course_videos
+         SET title = ?, url = ?, duration = ?, sort_order = ?
+         WHERE id = ? AND course_id = ?`,
+        [
+          video.title.trim(),
+          video.url || "",
+          video.duration || "",
+          i,
+          existingId,
+          courseId,
+        ]
+      );
+
+      retainedIds.push(existingId);
+    } else {
+      const result = await query(
+        `INSERT INTO course_videos
+          (course_id, title, url, duration, sort_order, uploaded_at)
+         VALUES (?, ?, ?, ?, ?, ?)`,
+        [
+          courseId,
+          video.title.trim(),
+          video.url || "",
+          video.duration || "",
+          i,
+          uploadedAt,
+        ]
+      );
+
+      retainedIds.push(Number(result.insertId));
+    }
+  }
+
+  // Only remove videos explicitly removed from the admin class.
+  const removedIds = existingRows
+    .map((row) => Number(row.id))
+    .filter((videoId) => !retainedIds.includes(videoId));
+
+  if (removedIds.length) {
+    const placeholders = removedIds.map(() => "?").join(",");
+
+    await query(
+      `DELETE FROM course_videos
+       WHERE course_id = ?
+         AND id IN (${placeholders})`,
+      [courseId, ...removedIds]
+    );
+  }
+}
+
+async function saveCourseMaterials(courseId, materials) {
+  const existingRows = await query(
+    `SELECT id, title, type, url, uploaded_at
+     FROM course_materials
+     WHERE course_id = ?
+     ORDER BY sort_order, id`,
+    [courseId]
+  );
+
+  const retainedIds = [];
+
+  for (let i = 0; i < materials.length; i++) {
+    const material = materials[i];
+
+    if (!material?.title?.trim()) continue;
+
+    const uploadedAt = material.uploadedAt
+      ? new Date(material.uploadedAt)
+      : new Date();
+
+    let existingId = Number(material.id ?? material.materialId);
+    let existing = existingId
+      ? existingRows.find((row) => Number(row.id) === existingId)
+      : null;
+
+    // Older payloads may not contain IDs. Match unchanged files by URL.
+    if (!existing && material.url) {
+      existing = existingRows.find(
+        (row) =>
+          !retainedIds.includes(Number(row.id)) &&
+          String(row.url || "") === String(material.url)
+      );
+    }
+
+    if (existing) {
+      existingId = Number(existing.id);
+
+      await query(
+        `UPDATE course_materials
+         SET title = ?, type = ?, url = ?, sort_order = ?
+         WHERE id = ? AND course_id = ?`,
+        [
+          material.title.trim(),
+          material.type || "PDF",
+          material.url || "",
+          i,
+          existingId,
+          courseId,
+        ]
+      );
+
+      retainedIds.push(existingId);
+    } else {
+      const result = await query(
+        `INSERT INTO course_materials
+          (course_id, title, type, url, sort_order, uploaded_at)
+         VALUES (?, ?, ?, ?, ?, ?)`,
+        [
+          courseId,
+          material.title.trim(),
+          material.type || "PDF",
+          material.url || "",
+          i,
+          uploadedAt,
+        ]
+      );
+
+      retainedIds.push(Number(result.insertId));
+    }
+  }
+
+  const removedIds = existingRows
+    .map((row) => Number(row.id))
+    .filter((materialId) => !retainedIds.includes(materialId));
+
+  if (removedIds.length) {
+    const placeholders = removedIds.map(() => "?").join(",");
+
+    await query(
+      `DELETE FROM course_materials
+       WHERE course_id = ?
+         AND id IN (${placeholders})`,
+      [courseId, ...removedIds]
+    );
+  }
+}
+
 exports.updateCourse = async (req, res) => {
   const { id } = req.params;
   const {
@@ -462,8 +655,17 @@ exports.updateCourse = async (req, res) => {
     await ensureSubjectName(subject, classLevel);
 
     // Replace child rows (simple & reliable for LMS admin UI)
-    await query("DELETE FROM course_videos WHERE course_id = ?", [id]);
-    await query("DELETE FROM course_materials WHERE course_id = ?", [id]);
+//     await query("DELETE FROM course_videos WHERE course_id = ?", [id]);
+//     await query("DELETE FROM course_materials WHERE course_id = ?", [id]);
+
+//     // Preserve existing video and material IDs so learner progress survives edits.
+// await saveCourseVideos(id, videos);
+// await saveCourseMaterials(id, materials);
+
+// Preserve existing video and material IDs.
+// Do not delete all rows because video watch progress references video IDs.
+await saveCourseVideos(id, videos);
+await saveCourseMaterials(id, materials);
 
     const quizIds = await query(
       "SELECT id FROM course_quizzes WHERE course_id = ?",
@@ -478,27 +680,27 @@ exports.updateCourse = async (req, res) => {
     }
     await query("DELETE FROM course_quizzes WHERE course_id = ?", [id]);
 
-    for (let i = 0; i < videos.length; i++) {
-      const v = videos[i];
-      if (!v?.title?.trim()) continue;
-      const uploadedAt = v.uploadedAt ? new Date(v.uploadedAt) : new Date();
-      await query(
-        `INSERT INTO course_videos (course_id, title, url, duration, sort_order, uploaded_at)
-         VALUES (?, ?, ?, ?, ?, ?)`,
-        [id, v.title.trim(), v.url || "", v.duration || "", i, uploadedAt]
-      );
-    }
+    // for (let i = 0; i < videos.length; i++) {
+    //   const v = videos[i];
+    //   if (!v?.title?.trim()) continue;
+    //   const uploadedAt = v.uploadedAt ? new Date(v.uploadedAt) : new Date();
+    //   await query(
+    //     `INSERT INTO course_videos (course_id, title, url, duration, sort_order, uploaded_at)
+    //      VALUES (?, ?, ?, ?, ?, ?)`,
+    //     [id, v.title.trim(), v.url || "", v.duration || "", i, uploadedAt]
+    //   );
+    // }
 
-    for (let i = 0; i < materials.length; i++) {
-      const m = materials[i];
-      if (!m?.title?.trim()) continue;
-      const uploadedAt = m.uploadedAt ? new Date(m.uploadedAt) : new Date();
-      await query(
-        `INSERT INTO course_materials (course_id, title, type, url, sort_order, uploaded_at)
-         VALUES (?, ?, ?, ?, ?, ?)`,
-        [id, m.title.trim(), m.type || "PDF", m.url || "", i, uploadedAt]
-      );
-    }
+    // for (let i = 0; i < materials.length; i++) {
+    //   const m = materials[i];
+    //   if (!m?.title?.trim()) continue;
+    //   const uploadedAt = m.uploadedAt ? new Date(m.uploadedAt) : new Date();
+    //   await query(
+    //     `INSERT INTO course_materials (course_id, title, type, url, sort_order, uploaded_at)
+    //      VALUES (?, ?, ?, ?, ?, ?)`,
+    //     [id, m.title.trim(), m.type || "PDF", m.url || "", i, uploadedAt]
+    //   );
+    // }
 
     const quizList =
       quizzes?.length > 0

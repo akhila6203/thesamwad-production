@@ -8,7 +8,8 @@ export default function CreateCourse() {
   const navigate = useNavigate();
 
   return (
-    <div className="p-6 bg-gray-80 min-h-screen">
+    // <div className="p-6 bg-gray-80 min-h-screen">
+    <div className="min-h-full bg-background text-foreground p-3 sm:p-4 lg:p-6">
       <StepHeader step={step} />
 
       <CourseDrawer

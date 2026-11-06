@@ -46,9 +46,13 @@ export default function SelectWithOther({
 
   return (
     <div className={className}>
-      {label && <label className="text-sm text-gray-600">{label}</label>}
+      {label && 
+      // <label className="text-sm text-gray-600">
+      <label className="text-sm font-medium text-muted-foreground">
+        {label}</label>}
       <select
-        className="w-full border rounded-lg px-3 py-2 mt-1 disabled:bg-gray-100"
+        // className="w-full border rounded-lg px-3 py-2 mt-1 disabled:bg-gray-100"
+        className="w-full border border-input rounded-lg px-3 py-2 mt-1 bg-background text-foreground disabled:bg-muted"
         value={selectValue}
         onChange={handleSelect}
         required={required && !othersMode}
@@ -72,7 +76,8 @@ export default function SelectWithOther({
             if (trimmed) onCustomCommit?.(trimmed);
           }}
           placeholder={otherPlaceholder}
-          className="w-full border rounded-lg px-3 py-2 mt-2 focus:ring-2 focus:ring-purple-500 outline-none"
+          className="w-full border border-input rounded-lg px-3 py-2 mt-2 bg-background text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-purple-500 outline-none"
+          // className="w-full border rounded-lg px-3 py-2 mt-2 focus:ring-2 focus:ring-purple-500 outline-none"
           required={required}
         />
       )}

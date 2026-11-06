@@ -57,9 +57,11 @@ export default function AddStudentModal({ onClose, onSuccess }) {
 
   return (
     <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 p-4">
-      <div className="bg-white w-full max-w-lg rounded-xl p-6 max-h-[90vh] overflow-y-auto">
+      {/* <div className="bg-white w-full max-w-lg rounded-xl p-6 max-h-[90vh] overflow-y-auto"> */}
+      <div className="admin-form-surface w-full max-w-lg rounded-xl border border-border bg-card text-card-foreground p-4 sm:p-6 max-h-[90vh] overflow-y-auto shadow-xl">
         <h2 className="text-lg font-semibold mb-1">Add student</h2>
-        <p className="text-sm text-gray-500 mb-4">
+        {/* <p className="text-sm text-gray-500 mb-4"> */}
+        <p className="text-sm text-muted-foreground mb-4">
           Creates a row in the <strong>users</strong> table. Share the password with the student
           or they can sign in with Google using the same email.
         </p>
@@ -67,9 +69,12 @@ export default function AddStudentModal({ onClose, onSuccess }) {
         {!credentials ? (
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="text-sm text-gray-600">Full name</label>
+              <label className="text-sm font-medium text-muted-foreground"
+              // className="text-sm text-gray-600"
+              > Full name</label>
               <input
-                className="w-full border rounded-lg px-3 py-2 mt-1"
+                // className="w-full border rounded-lg px-3 py-2 mt-1"
+                className="w-full rounded-lg border border-input bg-background text-foreground placeholder:text-muted-foreground px-3 py-2.5 mt-1 outline-none focus:ring-2 focus:ring-ring"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
@@ -79,7 +84,8 @@ export default function AddStudentModal({ onClose, onSuccess }) {
               <label className="text-sm text-gray-600">Email</label>
               <input
                 type="email"
-                className="w-full border rounded-lg px-3 py-2 mt-1"
+                className="w-full rounded-lg border border-input bg-background text-foreground placeholder:text-muted-foreground px-3 py-2.5 mt-1 outline-none focus:ring-2 focus:ring-ring"
+                // className="w-full border rounded-lg px-3 py-2 mt-1"
                 value={email}
                 onChange={(e) => setEmail(e.target.value.toLowerCase())}
                 required
@@ -91,16 +97,25 @@ export default function AddStudentModal({ onClose, onSuccess }) {
               <label className="text-sm text-gray-600">Password (optional)</label>
               <input
                 type="text"
-                className="w-full border rounded-lg px-3 py-2 mt-1"
+                className="w-full rounded-lg border border-input bg-background text-foreground placeholder:text-muted-foreground px-3 py-2.5 mt-1 outline-none focus:ring-2 focus:ring-ring"
+                // className="w-full border rounded-lg px-3 py-2 mt-1"
                 placeholder="Auto-generated if empty"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
             </div>
             <div className="flex justify-end gap-3 pt-2">
-              <button type="button" onClick={onClose} disabled={loading}>
+              {/* <button type="button" onClick={onClose} disabled={loading}>
                 Cancel
-              </button>
+              </button> */}
+              <button
+  type="button"
+  onClick={onClose}
+  disabled={loading}
+  className="rounded-lg border border-border px-4 py-2 text-foreground hover:bg-muted transition"
+>
+  Cancel
+</button>
               <button
                 type="submit"
                 disabled={loading}
@@ -112,21 +127,26 @@ export default function AddStudentModal({ onClose, onSuccess }) {
           </form>
         ) : (
           <div className="space-y-4">
-            <div className="rounded-lg border border-green-200 bg-green-50 p-4 text-sm">
-              <p className="font-medium text-green-800 mb-2">Share these credentials</p>
+            <div className="rounded-lg border border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-950/30 p-4 text-sm text-foreground">
+            {/* <div className="rounded-lg border border-green-200 bg-green-50 p-4 text-sm"> */}
+              {/* <p className="font-medium text-green-800 mb-2"> */}
+              <p className="font-medium text-green-800 dark:text-green-300 mb-2">
+                Share these credentials</p>
               <p>
                 <span className="text-gray-500">Email:</span> {credentials.email}
               </p>
               <p>
                 <span className="text-gray-500">Password:</span>{" "}
-                <code className="bg-white px-1 rounded">{credentials.password}</code>
+                {/* <code className="bg-white px-1 rounded"> */}
+                <code className="bg-white dark:bg-[#30343B] text-slate-900 dark:text-white px-1 rounded">
+                  {credentials.password}</code>
               </p>
               <p className="text-xs text-gray-600 mt-2">{credentials.note}</p>
             </div>
             <button
               type="button"
               onClick={copyAll}
-              className="flex items-center gap-2 text-sm text-purple-600 hover:underline"
+              className="flex items-center gap-2 text-sm text-[#2879B5]  hover:underline"
             >
               <Copy className="w-4 h-4" /> Copy credentials
             </button>

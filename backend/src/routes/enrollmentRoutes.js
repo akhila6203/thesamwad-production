@@ -7,6 +7,9 @@ const {
   completeQuiz,
   deleteEnrollment,
   getRecommended,
+   getVideoWatchProgress,
+  saveVideoWatchProgress,
+  
 } = require("../controllers/enrollmentController");
 
 
@@ -19,5 +22,17 @@ router.delete("/classes/:courseId", verifyUser, deleteEnrollment);
 router.post("/courses/:courseId/progress", verifyUser, markLessonProgress);
 router.post("/courses/:courseId/quiz-complete", verifyUser, completeQuiz);
 router.delete("/courses/:courseId", verifyUser, deleteEnrollment);
+
+router.get(
+  "/classes/:courseId/video-progress",
+  verifyUser,
+  getVideoWatchProgress
+);
+
+router.post(
+  "/classes/:courseId/video-progress",
+  verifyUser,
+  saveVideoWatchProgress
+);
 
 module.exports = router;

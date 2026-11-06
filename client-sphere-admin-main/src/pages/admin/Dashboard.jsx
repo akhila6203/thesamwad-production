@@ -128,7 +128,7 @@ export default function AdminDashboard() {
             <div className="flex items-center justify-between mb-3">
               <p className="font-semibold dark:text-white">Total Students</p>
               <div className="bg-purple-100 dark:bg-purple-900 p-2 rounded-full">
-                <Users className="text-purple-600 dark:text-purple-300" size={18} />
+                <Users className="text-[#2879B5]  dark:text-purple-300" size={18} />
               </div>
             </div>
             <h2 className="text-3xl font-bold dark:text-white">

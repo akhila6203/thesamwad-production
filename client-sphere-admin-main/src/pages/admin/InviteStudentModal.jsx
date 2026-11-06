@@ -141,7 +141,8 @@ export default function InviteStudentModal({ onClose, onSuccess }) {
           )}
 
           <div className="flex justify-end gap-3 pt-2">
-            <button type="button" onClick={onClose}>
+            <button type="button" onClick={onClose}
+            className="rounded-lg border border-border px-4 py-2 text-foreground hover:bg-muted transition">
               Close
             </button>
             <button

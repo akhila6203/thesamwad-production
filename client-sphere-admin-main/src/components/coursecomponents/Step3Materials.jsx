@@ -22,22 +22,50 @@ export default function Step3({ onNext, data = {}, setStep, isModal = false, isE
   const [materials, setMaterials] = useState([]);
   const [uploading, setUploading] = useState(false);
 
+  // useEffect(() => {
+  //   const existing = data?.materials || [];
+  //   if (isEdit && existing[0]) {
+  //     const m = existing[0];
+  //     setForm({
+  //       title: m.title || m.name || "",
+  //       type: m.type || "PDF",
+  //       url: m.url || "",
+  //       uploadedAt: m.uploadedAt || m.createdAt || "",
+  //     });
+  //     setMaterials([]);
+  //   } else {
+  //     setForm({ title: "", type: "PDF", url: "", uploadedAt: "" });
+  //     setMaterials(isEdit ? [] : existing);
+  //   }
+  // }, [data, isEdit]);
   useEffect(() => {
-    const existing = data?.materials || [];
-    if (isEdit && existing[0]) {
-      const m = existing[0];
-      setForm({
-        title: m.title || m.name || "",
-        type: m.type || "PDF",
-        url: m.url || "",
-        uploadedAt: m.uploadedAt || m.createdAt || "",
-      });
-      setMaterials([]);
-    } else {
-      setForm({ title: "", type: "PDF", url: "", uploadedAt: "" });
-      setMaterials(isEdit ? [] : existing);
-    }
-  }, [data, isEdit]);
+  const existing = data?.materials || [];
+
+  if (isEdit) {
+    setMaterials(
+      existing.map((m) => ({
+        ...m,
+        id: m.id ?? m.materialId ?? null,
+      }))
+    );
+
+    setForm({
+      title: "",
+      type: "PDF",
+      url: "",
+      uploadedAt: "",
+    });
+  } else {
+    setForm({
+      title: "",
+      type: "PDF",
+      url: "",
+      uploadedAt: "",
+    });
+
+    setMaterials(existing);
+  }
+}, [data, isEdit]);
 
   const uploadFile = async (file) => {
     if (!file) return;
@@ -79,27 +107,60 @@ export default function Step3({ onNext, data = {}, setStep, isModal = false, isE
     setForm({ title: "", type: "PDF", url: "", uploadedAt: "" });
   };
 
-  const buildMaterialFromForm = () => ({
+  // const buildMaterialFromForm = () => ({
+  //   title: form.title.trim(),
+  //   type: form.type || "PDF",
+  //   url: form.url || "",
+  //   uploadedAt: form.uploadedAt || new Date().toISOString(),
+  // });
+    const buildMaterialFromForm = () => ({
+    id: data?.materials?.[0]?.id ?? null,
     title: form.title.trim(),
     type: form.type || "PDF",
     url: form.url || "",
     uploadedAt: form.uploadedAt || new Date().toISOString(),
   });
 
+  // const collectMaterials = () => {
+  //   if (isEdit) {
+  //     if (form.title?.trim()) return [buildMaterialFromForm()];
+  //     return data?.materials || [];
+  //   }
+  //   if (materials.length > 0) return materials;
+  //   if (form.title?.trim()) return [buildMaterialFromForm()];
+  //   return data?.materials || [];
+  // };
   const collectMaterials = () => {
-    if (isEdit) {
-      if (form.title?.trim()) return [buildMaterialFromForm()];
-      return data?.materials || [];
-    }
-    if (materials.length > 0) return materials;
-    if (form.title?.trim()) return [buildMaterialFromForm()];
-    return data?.materials || [];
-  };
+  const currentMaterial = form.title?.trim()
+    ? {
+        id: null,
+        title: form.title.trim(),
+        type: form.type || "PDF",
+        url: form.url || "",
+        uploadedAt: form.uploadedAt || new Date().toISOString(),
+      }
+    : null;
+
+  if (isEdit) {
+    return currentMaterial
+      ? [...materials, currentMaterial]
+      : materials;
+  }
+
+  if (materials.length > 0) {
+    return currentMaterial
+      ? [...materials, currentMaterial]
+      : materials;
+  }
+
+  return currentMaterial ? [currentMaterial] : data?.materials || [];
+};
 
   const goNext = () => onNext({ materials: collectMaterials() });
 
   return (
-    <div className="max-w-5xl mx-auto">
+    // <div className="max-w-5xl mx-auto">
+    <div className="mx-auto w-full min-w-0 max-w-5xl">
       {!isModal && (
         <div className="mb-6">
           <h1 className="text-xl font-semibold">Add material</h1>
@@ -108,8 +169,8 @@ export default function Step3({ onNext, data = {}, setStep, isModal = false, isE
           </p>
         </div>
       )}
-
-      <div className={`space-y-5 ${isModal ? "" : "bg-white rounded-2xl shadow p-6"}`}>
+      <div className={`min-w-0 space-y-5 ${isModal ? "" : "rounded-2xl border border-border bg-card p-3 text-card-foreground shadow-sm sm:p-5 lg:p-6"}`}>
+      {/* <div className={`space-y-5 ${isModal ? "" : "bg-white rounded-2xl shadow p-6"}`}> */}
         <div>
           <label className="text-sm font-medium">Material Title</label>
           <input
@@ -210,7 +271,7 @@ export default function Step3({ onNext, data = {}, setStep, isModal = false, isE
             }}
             onDragLeave={() => setDragActive(false)}
             onDrop={handleDrop}
-            className={`border-2 border-dashed rounded-xl p-8 text-center transition
+            className={`rounded-xl border-2 border-dashed p-5 text-center transition sm:p-8
               ${dragActive ? "border-blue-500 bg-blue-50" : "border-gray-300"}
               ${uploading ? "opacity-60 pointer-events-none" : "cursor-pointer"}
             `}
@@ -230,7 +291,8 @@ export default function Step3({ onNext, data = {}, setStep, isModal = false, isE
           </div>
         </div>
 
-        <div className="flex justify-end gap-3 pt-4">
+        {/* <div className="flex justify-end gap-3 pt-4"> */}
+        <div className="flex flex-col-reverse gap-2 pt-4 sm:flex-row sm:justify-end sm:gap-3">
           {isModal ? (
             <button
               type="button"

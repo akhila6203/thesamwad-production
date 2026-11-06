@@ -263,3 +263,33 @@ CREATE TABLE IF NOT EXISTS admin_integrations (
 
 -- Vocabulary lookup uses external dictionary API; lesson matches search courses + course_videos.
 -- Progress is tracked per topic (video/material) in course_lesson_progress — no schema change needed.
+
+
+
+
+
+CREATE TABLE IF NOT EXISTS course_video_watch_progress (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  enrollment_id INT NOT NULL,
+  video_id INT NOT NULL,
+  current_position_seconds DECIMAL(10,2) NOT NULL DEFAULT 0,
+  duration_seconds DECIMAL(10,2) NOT NULL DEFAULT 0,
+  watched_ranges LONGTEXT NOT NULL,
+  progress_percent DECIMAL(5,2) NOT NULL DEFAULT 0,
+  completed TINYINT(1) NOT NULL DEFAULT 0,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    ON UPDATE CURRENT_TIMESTAMP,
+
+  UNIQUE KEY unique_enrollment_video (enrollment_id, video_id),
+  KEY idx_watch_video (video_id),
+
+  CONSTRAINT fk_watch_enrollment
+    FOREIGN KEY (enrollment_id)
+    REFERENCES course_enrollments(id)
+    ON DELETE CASCADE,
+
+  CONSTRAINT fk_watch_video
+    FOREIGN KEY (video_id)
+    REFERENCES course_videos(id)
+    ON DELETE CASCADE
+);

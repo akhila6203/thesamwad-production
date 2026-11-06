@@ -43,6 +43,8 @@ export default function CourseViewPage() {
   const [activeQuizId, setActiveQuizId] = useState(null);
   const [progressInfo, setProgressInfo] = useState(null);
 
+  const [videoProgress, setVideoProgress] = useState({});
+
   useEffect(() => {
     let cancelled = false;
 
@@ -56,30 +58,88 @@ export default function CourseViewPage() {
         setCourse(mapped);
         const firstPlayable = mapped.videos?.find((v) => v.free && v.url) || mapped.videos?.[0];
         
-        setActive(
-          firstPlayable
-            ? {
-                id: firstPlayable.id,
-                title: firstPlayable.title,
-                duration: firstPlayable.duration,
-                url: firstPlayable.url,
-              }
-            : null
-        );
+        
+//         setActive(
+//   firstPlayable
+//     ? {
+//         id: firstPlayable.id,
+//         index: mapped.videos.indexOf(firstPlayable),
+//         title: firstPlayable.title,
+//         duration: firstPlayable.duration,
+//         url: firstPlayable.url,
+//         resumeAt: 0,
+//         watchedRanges: [],
+//         completed: false,
+//       }
+//     : null
+// );
+setActive(
+  firstPlayable
+    ? {
+        id: firstPlayable.id ?? firstPlayable.videoId ?? firstPlayable.video_id,
+        databaseVideoId:
+          firstPlayable.databaseVideoId ??
+          firstPlayable.database_video_id ??
+          firstPlayable.id ??
+          firstPlayable.videoId ??
+          firstPlayable.video_id,
+        index: mapped.videos.indexOf(firstPlayable),
+        title: firstPlayable.title,
+        duration: firstPlayable.duration,
+        url: firstPlayable.url,
+        resumeAt: 0,
+        watchedRanges: [],
+        completed: false,
+      }
+    : null
+);
 
         if (mapped.enrolled) {
-          enrollmentService.getMyClasses().then((res) => {
-            const row = (res.data.courses || []).find(
-              (c) => String(c.courseId) === String(mapped.id)
-            );
-            if (row) {
-              setProgressInfo({
-                percent: row.progressPercent,
-                courseComplete: row.courseComplete,
-                quizDone: row.quizDone,
-              });
-            }
-          });
+          enrollmentService.getMyClasses()
+  .then((myRes) => {
+    const row = (myRes.data.courses || []).find(
+      (c) => String(c.courseId) === String(mapped.id)
+    );
+
+    if (row) {
+      setProgressInfo({
+        percent: Number(row.progressPercent) || 0,
+        courseComplete: Boolean(row.courseComplete),
+        quizDone: Boolean(row.quizDone),
+      });
+    }
+  })
+  .catch((err) => {
+    console.error("Unable to load saved course progress:", err);
+  });
+          
+          enrollmentService.getVideoProgress(mapped.id)
+  .then((res) => {
+  const progressMap = {};
+
+  (res.data.videoProgress || []).forEach((item) => {
+    progressMap[item.videoId] = item;
+  });
+
+  setVideoProgress(progressMap);
+
+setActive((previous) => {
+  if (!previous) return previous;
+
+  // const saved = progressMap[previous.id];
+  const saved = progressMap[previous.databaseVideoId ?? previous.id];
+
+  return {
+    ...previous,
+    resumeAt: Number(saved?.currentPositionSeconds || 0),
+    watchedRanges: saved?.watchedRanges || [],
+    completed: Boolean(saved?.completed),
+  };
+});
+}).catch((err) => {
+    console.error("Unable to load video progress:", err);
+  });
+
         }
       } catch {
         if (!cancelled) setCourse(null);
@@ -133,52 +193,76 @@ export default function CourseViewPage() {
   const progress = progressInfo?.percent ?? 0;
   const enrolled = course.enrolled;
 
-  const playLesson = async (l, i) => {
-    if (l.locked || (!l.url && !l.free)) {
-      toast.info("This lesson is locked");
-      return;
-    }
-    const nextLesson = {
-      id: l.id || `v${i + 1}`,
-      title: l.title || `Lesson ${i + 1}`,
-      duration: l.duration || "0:00",
-      url: l.url,
-    };
-    setActive(nextLesson);
-    if (enrolled) {
-      try {
-        const res = await enrollmentService.saveProgress(
-          course.id,
-          `video:${i + 1}`,
-          "video"
-        );
-        setProgressInfo(res.data.progress);
-      } catch {
-        /* ignore */
-      }
-    }
-  };
+  const allVideosCompleted =
+  Boolean(enrolled) &&
+  lessonCount > 0 &&
+  course.videos.every((video) => {
+    const videoId =
+      video.databaseVideoId ??
+      video.database_video_id ??
+      video.id ??
+      video.videoId ??
+      video.video_id;
+
+    return Boolean(
+      videoProgress[videoId]?.completed || video.done
+    );
+  });
+
+ const playLesson = (lesson, index) => {
+  if (lesson.locked || !lesson.url) {
+    toast.info("This lesson is locked or its video URL is missing.");
+    return;
+  }
+
+  // const lessonId =
+  //   lesson.id ??
+  //   lesson.videoId ??
+  //   lesson.video_id ??
+  //   lesson.databaseVideoId ??
+  //   lesson.database_video_id;
+  const lessonId =
+  lesson.databaseVideoId ??
+  lesson.database_video_id ??
+  lesson.id ??
+  lesson.videoId ??
+  lesson.video_id;
+
+  const progressKey = lessonId ?? `v${index + 1}`;
+  const saved = videoProgress[progressKey];
+
+  setActive({
+    id: progressKey,
+    databaseVideoId: lessonId,
+    index,
+    title: lesson.title || `Lesson ${index + 1}`,
+    duration: lesson.duration || "0:00",
+    url: lesson.url,
+    resumeAt: Number(saved?.currentPositionSeconds || 0),
+    watchedRanges: saved?.watchedRanges || [],
+    completed: Boolean(saved?.completed),
+  });
+};
+
 
   const startQuiz = (qz, i) => {
-    if (!enrolled) {
-      toast.info("Enroll to access quizzes");
-      return;
-    }
-    if (!progressInfo?.courseComplete) {
-      window.alert(
-        "Complete the full course (all lessons and materials) before starting the quiz."
-      );
-      return;
-    }
-    setQuizTitle(qz.quizTitle || `Quiz ${i + 1}`);
-    setActiveQuizId(qz.id ?? null);
-    setQuizQuestions(
-      qz.questions?.length
-        ? qz.questions
-        : sampleQuiz
-    );
-    setQuizOpen(true);
-  };
+  if (!enrolled) {
+    toast.info("Enroll to access quizzes");
+    return;
+  }
+
+  if (!allVideosCompleted) {
+    toast.info("Complete all lessons before starting the quiz");
+    return;
+  }
+
+  setQuizTitle(qz.quizTitle || `Quiz ${i + 1}`);
+  setActiveQuizId(qz.id ?? null);
+  setQuizQuestions(
+    qz.questions?.length ? qz.questions : sampleQuiz
+  );
+  setQuizOpen(true);
+};
 
   return (
     <PageWithFooter variant="user">
@@ -197,13 +281,98 @@ export default function CourseViewPage() {
         <div className="space-y-5">
 
           <Card className="overflow-hidden border-border/60 p-0 shadow-sm border border-border">
-            <VideoPlayer
+            {/* <VideoPlayer
               key={active?.id}
               src={active?.url}
               poster={course.thumbnail || course.cover}
               title={active?.title}
               subtitle={active?.duration}
-            />
+            /> */}
+            <VideoPlayer
+  key={active?.id}
+  src={active?.url}
+  poster={course.thumbnail || course.cover}
+  title={active?.title}
+  subtitle={active?.duration}
+  initialTime={active?.resumeAt || 0}
+  initialWatchedRanges={active?.watchedRanges || []}
+  // trackProgress={Boolean(enrolled && active?.id)}
+  trackProgress={
+  Boolean(enrolled && /^\d+$/.test(String(active?.databaseVideoId ?? "")))
+}
+  
+  onWatchProgress={async (watchData) => {
+  if (
+    !enrolled ||
+    !/^\d+$/.test(String(active?.databaseVideoId ?? ""))
+  ) {
+    throw new Error("Invalid video ID or enrollment");
+  }
+
+  const res = await enrollmentService.saveVideoProgress(course.id, {
+    videoId: Number(active.databaseVideoId),
+    currentPositionSeconds: watchData.currentPositionSeconds,
+    durationSeconds: watchData.durationSeconds,
+    watchedRanges: watchData.watchedRanges,
+    completed: watchData.completed,
+  });
+
+  const saved = res.data.video;
+
+  if (!saved) {
+    throw new Error("Video progress was not returned by the server");
+  }
+
+  setVideoProgress((previous) => ({
+    ...previous,
+    [active.databaseVideoId]: {
+      ...previous[active.databaseVideoId],
+      ...saved,
+      watchedRanges: saved.watchedRanges || [],
+    },
+  }));
+  if (saved.completed) {
+  toast.success("Lesson completed!");
+}
+
+  // Refresh the overall course progress from the backend.
+  if (res.data.progress) {
+    setProgressInfo({
+      percent: Number(res.data.progress.percent) || 0,
+      courseComplete: Boolean(res.data.progress.courseComplete),
+      quizDone: Boolean(res.data.progress.quizDone),
+    });
+  }
+
+  return saved;
+}}
+
+onComplete={() => {
+  if (!enrolled || !active?.databaseVideoId) return;
+
+  const saved = videoProgress[active.databaseVideoId];
+
+  if (saved?.completed) {
+    toast.success("Lesson completed!");
+  }
+}}
+//       onComplete={() => {
+//   if (!enrolled || !active?.databaseVideoId) return;
+
+//   setVideoProgress((previous) => ({
+//     ...previous,
+//     [active.databaseVideoId]: {
+//       ...previous[active.databaseVideoId],
+//       completed: true,
+//       progressPercent: 100,
+//     },
+//   }));
+
+//   toast.success("Lesson completed!");
+// }}
+      
+  
+/>
           </Card>
 
           <div className="rounded-xl p-6  ">
@@ -214,7 +383,7 @@ export default function CourseViewPage() {
       {course.category || course.classLevel}
     </span>
     {(course.subCategory || course.subject) && (
-      <span className="bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded">
+      <span className="bg-blue-100 text-[#2879B5] text-xs px-2 py-1 rounded">
         {course.subCategory || course.subject}
       </span>
     )}
@@ -286,7 +455,7 @@ export default function CourseViewPage() {
               {(course.materials?.length ? course.materials : defaultMaterials).map((m, i) => (
                 <Card key={i} className="flex items-center justify-between p-4 shadow-sm border border-border">
                   <div className="flex items-center gap-3">
-                    <FileText className="w-5 h-5 text-purple-600" />
+                    <FileText className="w-5 h-5 text-[#2879B5] " />
                     <div>
                       <p className="text-sm font-medium">{m.title || m.name || `Material ${i + 1}`}</p>
                       <p className="text-xs text-muted-foreground">{m.type || "FILE"}</p>
@@ -294,30 +463,56 @@ export default function CourseViewPage() {
                   </div>
                   <Button
                     size="sm"
+                    
                     onClick={async () => {
-                      if (m.locked) {
-                        toast.info("Sign in and enroll to open materials");
-                        return;
-                      }
-                      if (m.url) {
-                        if (enrolled) {
-                          try {
-                            const res = await enrollmentService.saveProgress(
-                              course.id,
-                              `material:${i + 1}`,
-                              "material"
-                            );
-                            setProgressInfo(res.data.progress);
-                          } catch {
-                            /* ignore */
-                          }
-                        }
-                        window.open(m.url, "_blank");
-                      }
-                    }}
-                    disabled={!m.url && !m.locked}
+  if (m.locked || !enrolled) {
+    toast.info("Sign in and enroll to open materials");
+    return;
+  }
+
+  if (!allVideosCompleted) {
+    toast.info("Complete all lessons before opening materials");
+    return;
+  }
+
+  if (!m.url) return;
+
+  const newTab = window.open("about:blank", "_blank");
+
+  try {
+    const materialKey = `material:${m.id || i + 1}`;
+
+    const res = await enrollmentService.saveProgress(
+      course.id,
+      materialKey,
+      "material"
+    );
+
+    setProgressInfo(res.data.progress);
+    if (newTab) {
+      newTab.location.href = m.url;
+    } else {
+      window.location.href = m.url;
+    }
+  } catch (err) {
+    newTab?.close();
+    toast.error(
+      err.response?.data?.message || "Unable to save material progress"
+    );
+  }
+}}
+
+                    // disabled={!m.url && !m.locked}
+                    disabled={Boolean(
+  m.locked || !allVideosCompleted || !m.url
+)}
                   >
-                    {m.locked ? "Locked" : "Open"}
+                    {/* {m.locked ? "Locked" : "Open"} */}
+                    {m.locked
+  ? "Locked"
+  : !allVideosCompleted
+    ? "Complete lessons"
+    : "Open"}
                   </Button>
                 </Card>
               ))}
@@ -332,9 +527,19 @@ export default function CourseViewPage() {
                       {(qz.questions?.length || 0)} questions
                     </p>
                   </div>
-                  <Button onClick={() => startQuiz(qz, i)} disabled={qz.locked}>
+                  {/* <Button onClick={() => startQuiz(qz, i)} disabled={qz.locked}>
                     {qz.locked ? "Locked" : "Start"}
-                  </Button>
+                  </Button> */}
+                  <Button
+  onClick={() => startQuiz(qz, i)}
+  disabled={Boolean(qz.locked || !allVideosCompleted)}
+>
+  {qz.locked
+    ? "Locked"
+    : !allVideosCompleted
+      ? "Complete lessons"
+      : "Start"}
+</Button>
                 </Card>
               ))}
               </TabsContent>
@@ -363,7 +568,7 @@ export default function CourseViewPage() {
                   Sign in with your registered Gmail to access all lessons.
                 </p>
                 <Button
-                  className="w-full rounded-full bg-gradient-to-r from-violet-600 to-indigo-500"
+                  className="w-full rounded-full bg-gradient-to-r from-[#2879B5] to-[#7fa5c3]"
                   onClick={() => {
                     const firstFree = course.videos?.find((v) => v.free && !v.locked);
                     if (firstFree) {
@@ -379,7 +584,7 @@ export default function CourseViewPage() {
             )}
             {enrolled && (
               <Button
-                className="mt-3 w-full rounded-full bg-gradient-to-r from-violet-600 to-indigo-500"
+                className="mt-3 w-full rounded-full bg-gradient-to-r from-[#2879B5] to-[#8dadc5]"
                 onClick={() => {
                   const next = course.videos?.find((v) => !v.locked && v.url);
                   if (next) playLesson(next, course.videos.indexOf(next));
@@ -391,38 +596,58 @@ export default function CourseViewPage() {
           </Card>
 
           <Card className="overflow-hidden p-0 shadow-sm border border-border">
-              {/* {(course.videos?.length ? course.videos : null).map((l, i) => ( */}
-              {(course.videos || []).map((l, i) => (
-                <button
-                  key={l.id || i}
-                  type="button"
-                  onClick={() => playLesson(l, i)}
-                  className="flex items-center justify-between w-full border-b px-3 sm:px-4 py-3 text-left text-sm"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 flex items-center justify-center rounded-lg bg-purple-100">
-                      {l.locked ? (
-                        <Lock className="w-4 h-4 text-gray-400" />
-                      ) : (
-                        <Play className="w-4 h-4 text-purple-600" />
-                      )}
-                    </div>
+  {(course.videos || []).map((l, i) => {
+    const videoId =
+      l.databaseVideoId ??
+      l.database_video_id ??
+      l.id ??
+      l.videoId ??
+      l.video_id;
 
-                    {/* TITLE */}
-                    <div className="text-left">
-                      <p  className="text-xs sm:text-sm font-medium">{l.title || `Lesson ${i + 1}`}</p>
-                      <p className="text-xs text-muted-foreground">{l.duration || "0:00"}</p>
-                    </div>
+    const savedProgress = videoProgress[videoId];
 
-                  </div>
+    return (
+      <button
+        key={videoId ?? i}
+        type="button"
+        onClick={() => playLesson(l, i)}
+        className="flex items-center justify-between w-full border-b px-3 sm:px-4 py-3 text-left text-sm"
+      >
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 flex items-center justify-center rounded-lg bg-purple-100">
+            {l.locked ? (
+              <Lock className="w-4 h-4 text-gray-400" />
+            ) : (
+              <Play className="w-4 h-4 text-[#2879B5] " />
+            )}
+          </div>
 
-                  {/* DONE ICON */}
-                  {l.done && (
-                    <Check className="w-4 h-4 text-green-500" />
-                  )}
-                </button>
-              ))}
-            </Card>
+          <div className="text-left">
+            <p className="text-xs sm:text-sm font-medium">
+              {l.title || `Lesson ${i + 1}`}
+            </p>
+
+            <p className="text-xs text-muted-foreground">
+              {l.duration || "0:00"}
+
+              {enrolled && savedProgress && (
+                <span className="ml-2 text-[#2879B5] ">
+                  {savedProgress.completed
+                    ? "Completed"
+                    : `${savedProgress.progressPercent || 0}% watched`}
+                </span>
+              )}
+            </p>
+          </div>
+        </div>
+
+        {(savedProgress?.completed || l.done) && (
+          <Check className="w-4 h-4 text-green-500" />
+        )}
+      </button>
+    );
+  })}
+</Card>
 
             {/* <Card className="p-6 shadow-sm border border-border">
   <div className="flex items-center gap-3">
@@ -476,3 +701,7 @@ export default function CourseViewPage() {
     </PageWithFooter>
   );
 }
+
+
+
+

@@ -256,7 +256,8 @@ export default function BulkImportModal({ onClose, onSuccess }) {
         )}
 
         <div className="flex justify-end gap-3 mt-6">
-          <button type="button" onClick={onClose} disabled={loading}>
+          <button type="button" onClick={onClose} disabled={loading}
+          className="rounded-lg border border-border px-4 py-2 text-foreground hover:bg-muted transition">
             {result?.imported > 0 ? "Close" : "Cancel"}
           </button>
           <button

@@ -368,7 +368,7 @@ export function PronunciationSearch({ open, onOpenChange }) {
 
                       <div key={i}>
 
-                        <p className="text-xs font-medium uppercase text-purple-600">
+                        <p className="text-xs font-medium uppercase text-[#2879B5] ">
 
                           {m.partOfSpeech}
 
@@ -547,8 +547,6 @@ export function PronunciationSearch({ open, onOpenChange }) {
   );
 
 }
-
-
 
 export default PronunciationSearch;
 

@@ -110,7 +110,7 @@ export function VocabularySearch({ open, onOpenChange }) {
 
             {dict.meanings?.map((m, i) => (
               <div key={i}>
-                <p className="text-xs font-medium uppercase text-purple-600">
+                <p className="text-xs font-medium uppercase text-[#2879B5] ">
                   {m.partOfSpeech}
                 </p>
                 <ul className="mt-1 space-y-2">

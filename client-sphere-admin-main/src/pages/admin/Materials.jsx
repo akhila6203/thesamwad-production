@@ -204,7 +204,8 @@ export default function MaterialsPage() {
 
   return (
     <div className="space-y-6 px-3 py-3 sm:px-4 sm:py-4">
-      <div className="flex justify-between items-start gap-4">
+      {/* <div className="flex justify-between items-start gap-4"> */}
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
         <div>
           <p className="text-sm text-gray-500">
             Resources from published classes appear here. Draft class uploads stay hidden until you publish.
@@ -212,6 +213,7 @@ export default function MaterialsPage() {
         </div>
 
         <div className="flex gap-2 shrink-0">
+        {/* <div className="flex flex-wrap gap-2 w-full sm:w-auto"> */}
           <Button
             variant="outline"
             onClick={() => {
@@ -239,16 +241,20 @@ export default function MaterialsPage() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard label="Total materials" value={stats.total} icon={FolderOpen} bg="bg-purple-100" color="text-purple-600" />
+        <StatCard label="Total materials" value={stats.total} icon={FolderOpen} bg="bg-purple-100" color="text-[#2879B5] " />
         <StatCard label="Videos" value={stats.videos} icon={FileVideo} bg="bg-blue-100" color="text-blue-600" />
         <StatCard label="Documents" value={stats.docs} icon={FileText} bg="bg-green-100" color="text-green-600" />
         <StatCard label="Classes linked" value={publishedCourses.length} icon={HardDrive} bg="bg-orange-100" color="text-orange-600" />
       </div>
 
       <Card>
-        <CardContent className="p-4 flex flex-col lg:flex-row justify-between items-stretch lg:items-center gap-4">
+        <CardContent className="p-3 sm:p-4 flex flex-col lg:flex-row justify-between items-stretch lg:items-center gap-4 min-w-0">
+        {/* <CardContent className="p-4 flex flex-col lg:flex-row justify-between items-stretch lg:items-center gap-4"> */}
           <Tabs value={tab} onValueChange={setTab}>
-            <TabsList className="bg-gray-100 p-1 rounded-xl flex flex-wrap gap-1">
+            <TabsList 
+            className="bg-muted p-1 rounded-xl flex flex-wrap gap-1 w-full"
+            // className="bg-gray-100 p-1 rounded-xl flex flex-wrap gap-1"
+            >
               {[
                 { label: "All", value: "all" },
                 { label: "PDFs", value: "PDF" },
@@ -258,7 +264,8 @@ export default function MaterialsPage() {
                 <TabsTrigger
                   key={t.value}
                   value={t.value}
-                  className="px-4 py-2 rounded-lg text-sm data-[state=active]:bg-white data-[state=active]:text-black data-[state=active]:shadow-sm"
+                  className="px-3 py-2 rounded-lg text-xs sm:text-sm data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm"
+                  // className="px-4 py-2 rounded-lg text-sm data-[state=active]:bg-white data-[state=active]:text-black data-[state=active]:shadow-sm"
                 >
                   {t.label}
                 </TabsTrigger>
@@ -370,7 +377,8 @@ function MaterialCard({ item, onDelete }) {
   return (
     <Card>
       <CardContent className="p-5">
-        <div className="flex justify-between">
+        {/* <div className="flex justify-between"> */}
+        <div className="flex justify-between items-start gap-2">
           <div className={`p-3 rounded-xl ring-1 ${meta.ring} ${meta.tint}`}>
             <Icon className="h-5 w-5" />
           </div>
@@ -413,7 +421,9 @@ function MaterialCard({ item, onDelete }) {
         </div>
 
         <h3 className="mt-3 font-medium break-words line-clamp-2">{item.title}</h3>
-        <p className="text-xs text-gray-500 break-words line-clamp-1">{item.course}</p>
+        {/* <p className="text-xs text-gray-500 break-words line-clamp-1"> */}
+        <p className="text-xs text-muted-foreground break-words line-clamp-1">
+          {item.course}</p>
         {(item.classLevel || item.subject || item.category || item.subCategory) && (
           <p className="text-xs text-gray-400 mt-1">
             {[item.classLevel || item.category, item.subject || item.subCategory]
@@ -540,7 +550,8 @@ function UploadMaterialDialog({ open, onOpenChange, courses, onSuccess }) {
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="max-w-lg rounded-2xl max-h-[90vh] overflow-y-auto">
+      {/* <DialogContent className="max-w-lg rounded-2xl max-h-[90vh] overflow-y-auto"> */}
+      <DialogContent className="admin-dialog-content w-[calc(100vw-20px)] sm:w-full max-w-lg rounded-2xl max-h-[90dvh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Upload material</DialogTitle>
           <DialogDescription>
@@ -559,7 +570,8 @@ function UploadMaterialDialog({ open, onOpenChange, courses, onSuccess }) {
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          {/* <div className="grid grid-cols-2 gap-3"> */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 admin-upload-grid">
             <div>
               <Label>Type</Label>
               <Select value={type} onValueChange={setType}>
@@ -599,7 +611,8 @@ function UploadMaterialDialog({ open, onOpenChange, courses, onSuccess }) {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          {/* <div className="grid grid-cols-2 gap-3"> */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <SubjectSelect
               label="Subject"
               value={subject}
@@ -721,7 +734,8 @@ function UploadMaterialDialog({ open, onOpenChange, courses, onSuccess }) {
 
 function StatCard({ label, value, icon: Icon, color, bg }) {
   return (
-    <div className="bg-white p-4 rounded-xl shadow flex justify-between items-center">
+    // <div className="bg-white p-4 rounded-xl shadow flex justify-between items-center">
+    <div className="bg-card text-card-foreground border border-border p-4 rounded-xl shadow-sm flex justify-between items-center min-w-0">
       <div>
         <p className="text-sm text-gray-500">{label}</p>
         <h2 className="text-xl font-semibold">{value}</h2>

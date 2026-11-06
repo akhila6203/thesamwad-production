@@ -1,5 +1,6 @@
 import { Outlet } from "react-router-dom";
 import Header from "../components/homecomponents/Header";
+import WhatsAppButton from "@/components/WhatsAppButton";
 
 export default function MainLayout({ children }) {
   return (
@@ -8,6 +9,8 @@ export default function MainLayout({ children }) {
       <main className="pt-16">
         {children ?? <Outlet />}
       </main>
+
+      <WhatsAppButton />
     </div>
   );
 }

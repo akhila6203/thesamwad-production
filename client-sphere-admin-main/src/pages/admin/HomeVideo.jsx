@@ -94,8 +94,10 @@ export default function AdminHomeVideo() {
   };
 
   return (
-    <div className="space-y-6 px-3 py-3 sm:px-4 sm:py-4">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+    // <div className="space-y-6 px-3 py-3 sm:px-4 sm:py-4">
+    <div className="w-full min-w-0 space-y-5 px-3 py-3 sm:px-4 sm:py-4 lg:px-6">
+      {/* <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between"> */}
+      <div className="flex w-full min-w-0 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm text-muted-foreground">
           Upload and manage demo videos shown on the homepage.
         </p>
@@ -119,7 +121,8 @@ export default function AdminHomeVideo() {
           No home videos yet. Click Add Home Video to upload one.
         </p>
       ) : (
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        // <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid w-full min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {videos.map((v) => (
             <div
               key={v.id}
@@ -128,15 +131,18 @@ export default function AdminHomeVideo() {
               <video
                 src={v.video_url}
                 controls
-                className="h-56 w-full object-cover"
+                // className="h-56 w-full object-cover"
+                className="aspect-video h-auto w-full bg-black object-contain"
               />
 
-              <div className="flex items-center justify-between p-3">
+              {/* <div className="flex items-center justify-between p-3"> */}
+              <div className="flex flex-wrap items-center justify-between gap-2 p-3">
                 <span className="text-sm capitalize text-muted-foreground">
                   {v.status}
                 </span>
 
-                <div className="flex gap-1">
+                {/* <div className="flex gap-1"> */}
+                <div className="flex flex-wrap items-center gap-1">
                   <Button
                     type="button"
                     variant="ghost"
@@ -164,7 +170,8 @@ export default function AdminHomeVideo() {
       )}
 
       <Dialog open={open} onOpenChange={handleOpenChange}>
-        <DialogContent className="max-w-lg rounded-2xl">
+        {/* <DialogContent className="max-w-lg rounded-2xl"> */}
+        <DialogContent className="w-[calc(100vw-24px)] max-w-lg max-h-[90dvh] overflow-y-auto rounded-2xl">
           <DialogHeader>
             <DialogTitle>
               {editing ? "Edit home video" : "Add home video"}
@@ -180,7 +187,8 @@ export default function AdminHomeVideo() {
             <video
               src={editing.video_url}
               controls
-              className="h-48 w-full rounded-lg object-cover"
+              // className="h-48 w-full rounded-lg object-cover"
+              className="aspect-video h-auto w-full rounded-lg bg-black object-contain"
             />
           )}
 

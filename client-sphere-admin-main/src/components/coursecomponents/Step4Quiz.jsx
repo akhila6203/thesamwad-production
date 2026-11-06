@@ -118,7 +118,8 @@ export default function Step4({ onNext, data, setStep, isModal = false, isEdit =
   };
 
   return (
-    <div className="max-w-5xl mx-auto space-y-6">
+    // <div className="max-w-5xl mx-auto space-y-6">
+    <div className="mx-auto w-full min-w-0 max-w-5xl space-y-4 sm:space-y-6">
       {!isModal && (
         <div>
           <h1 className="text-xl font-semibold">Create a quiz</h1>
@@ -138,7 +139,8 @@ export default function Step4({ onNext, data, setStep, isModal = false, isEdit =
         />
       </div>
 
-      <div className="flex flex-wrap items-center gap-2">
+      {/* <div className="flex flex-wrap items-center gap-2"> */}
+      <div className="flex min-w-0 flex-wrap items-center gap-2">
         {QUESTION_TYPES.map((t) => (
           <button
             key={t.id}
@@ -162,7 +164,8 @@ export default function Step4({ onNext, data, setStep, isModal = false, isEdit =
       {questions.map((q, i) => (
         <div
           key={i}
-          className="bg-white rounded-2xl shadow p-5 space-y-4 relative border"
+          className="relative min-w-0 space-y-4 rounded-2xl border border-border bg-card p-3 text-card-foreground shadow-sm sm:p-5"
+          // className="bg-white rounded-2xl shadow p-5 space-y-4 relative border"
         >
           {questions.length > 1 && (
             <button
@@ -189,11 +192,13 @@ export default function Step4({ onNext, data, setStep, isModal = false, isEdit =
                 ? "Type your question (use ___ for blank if needed)..."
                 : "Type your question..."
             }
-            className="w-full border rounded-lg px-4 py-3"
+            // className="w-full border rounded-lg px-4 py-3"
+            className="w-full min-w-0 rounded-lg border border-input bg-background px-3 py-3 text-sm text-foreground sm:px-4"
           />
 
           {q.type === "radio" && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            // <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid min-w-0 grid-cols-1 gap-3 lg:grid-cols-2">
               {q.options.map((opt, j) => (
                 <div
                   key={j}
@@ -259,7 +264,8 @@ export default function Step4({ onNext, data, setStep, isModal = false, isEdit =
         </div>
       ))}
 
-      <div className="flex justify-end gap-3 pt-4">
+      {/* <div className="flex justify-end gap-3 pt-4"> */}
+      <div className="flex flex-col-reverse gap-2 pt-4 sm:flex-row sm:justify-end sm:gap-3">
         {isModal ? (
           <button
             type="button"

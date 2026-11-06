@@ -68,7 +68,8 @@ export default function Step1({ onNext, data = {}, setStep, isModal = false }) {
   };
 
   return (
-    <div className="max-w-6xl mx-auto">
+    // <div className="max-w-6xl mx-auto">
+    <div className="mx-auto w-full min-w-0 max-w-6xl">
       {!isModal && (
         <div className="mb-6">
           <h1 className="text-2xl font-semibold">Create a new class</h1>
@@ -78,7 +79,8 @@ export default function Step1({ onNext, data = {}, setStep, isModal = false }) {
         </div>
       )}
 
-      <div className={`space-y-6 ${isModal ? "" : "bg-white rounded-2xl shadow p-6"}`}>
+      {/* <div className={`space-y-6 ${isModal ? "" : "bg-white rounded-2xl shadow p-6"}`}> */}
+      <div className={`space-y-6 admin-form-surface ${isModal ? "" : "bg-card text-card-foreground border border-border rounded-2xl shadow p-4 sm:p-6"}`}>
         {!isModal && (
           <div>
             <h2 className="font-semibold text-lg">Class details</h2>
@@ -118,7 +120,8 @@ export default function Step1({ onNext, data = {}, setStep, isModal = false }) {
           />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-4"> */}
+        <div className="grid min-w-0 grid-cols-1 gap-4 lg:grid-cols-2">
           <SelectWithOther
             label="Class"
             value={form.classLevel}
@@ -171,7 +174,8 @@ export default function Step1({ onNext, data = {}, setStep, isModal = false }) {
             <img
               src={form.thumbnail}
               alt="thumbnail"
-              className="w-40 h-24 object-cover rounded mt-3"
+              // className="w-40 h-24 object-cover rounded mt-3"
+              className="mt-3 h-24 w-full max-w-40 rounded-lg object-cover sm:w-40"
             />
           )}
         </div>
@@ -180,7 +184,8 @@ export default function Step1({ onNext, data = {}, setStep, isModal = false }) {
           <label className="text-sm font-medium">Overview / What you'll learn</label>
 
           {overview.map((item, index) => (
-            <div key={index} className="flex gap-2 mt-2">
+            // <div key={index} className="flex gap-2 mt-2">
+            <div key={index} className="mt-2 flex min-w-0 flex-col gap-2 sm:flex-row">
               <input
                 value={item}
                 onChange={(e) => {
@@ -189,7 +194,8 @@ export default function Step1({ onNext, data = {}, setStep, isModal = false }) {
                   setOverview(updated);
                 }}
                 placeholder="e.g. Build real LMS project"
-                className="w-full border rounded-lg px-4 py-2"
+                // className="w-full border rounded-lg px-4 py-2"
+                className="w-full min-w-0 rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground sm:px-4"
               />
 
               <button
@@ -213,7 +219,8 @@ export default function Step1({ onNext, data = {}, setStep, isModal = false }) {
           </button>
         </div>
 
-        <div className="flex justify-end gap-3 pt-4">
+        {/* <div className="flex justify-end gap-3 pt-4"> */}
+        <div className="flex flex-col-reverse gap-2 pt-4 sm:flex-row sm:justify-end sm:gap-3">
           {isModal ? (
             <button
               type="button"

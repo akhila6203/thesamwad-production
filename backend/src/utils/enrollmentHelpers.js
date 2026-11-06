@@ -2,11 +2,25 @@ const { query } = require("./dbQuery");
 
 const PREVIEW_LESSON_COUNT = 1;
 
+// const mapVideoForAccess = (row, index, enrolled) => ({
+//   title: row.title,
+//   duration: row.duration || "",
+//   uploadedAt: row.uploaded_at,
+//   sortOrder: index,
+//   free: enrolled || index < PREVIEW_LESSON_COUNT,
+//   url: enrolled || index < PREVIEW_LESSON_COUNT ? row.url || "" : "",
+//   locked: !enrolled && index >= PREVIEW_LESSON_COUNT,
+// });
 const mapVideoForAccess = (row, index, enrolled) => ({
+  id: Number(row.id),
+  videoId: Number(row.id),
+  databaseVideoId: Number(row.id),
+
   title: row.title,
   duration: row.duration || "",
   uploadedAt: row.uploaded_at,
   sortOrder: index,
+
   free: enrolled || index < PREVIEW_LESSON_COUNT,
   url: enrolled || index < PREVIEW_LESSON_COUNT ? row.url || "" : "",
   locked: !enrolled && index >= PREVIEW_LESSON_COUNT,
